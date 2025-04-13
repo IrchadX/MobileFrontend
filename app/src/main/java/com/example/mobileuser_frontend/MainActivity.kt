@@ -4,109 +4,123 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.FloatingActionButtonDefaults
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mobileuser_frontend.API.ApiResponse
+import com.example.mobileuser_frontend.API.ApiService
+import com.example.mobileuser_frontend.module.NavBarItem
 import com.example.mobileuser_frontend.ui.theme.MobileUser_FrontendTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
             MobileUser_FrontendTheme {
                 val navController = rememberNavController()
-                val currentRoute = currentRoute(navController)
-                val hiddenBottomBarRoutes = setOf(
-                    "AddAidant"
-                )
+                var dragAmount by remember { mutableStateOf(0f) }
+                val density = LocalDensity.current
+                val sensitivity = with(density) { 100.dp.toPx() } // Convert dp to pixels
+
+
                 Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(WindowInsets.navigationBars.asPaddingValues())
+                        ,
+
                     bottomBar = {
-                        if (currentRoute !in hiddenBottomBarRoutes) {
                             NavBar(navController)
-                        }
+
                     }
                 ) {
-                    PageNavigation()
+                    PageNavigation(navController)
                 }
             }
         }
     }
+
 }
 
-//Fonction pour récupérer la route actuelle
+
+
 @Composable
-fun currentRoute(navController: NavController): String? {
+fun NavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
+    val currentRoute = navBackStackEntry?.destination?.route
 
-}
-
-
-@Composable
-fun NavBar(navController: NavController){
-    val c = currentRoute(navController = navController)
     Box(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween, // Ensures proper spacing
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .align(Alignment.BottomCenter) // Places it at the bottom
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .background(color = Color(0xffd1f1e6))
                 .padding(horizontal = 40.dp)
         ) {
             // Home Button
-            Button(
-                onClick = {
-                    println("Current Route: $c")
-                    //navController.navigate(Screens.MainScreen.route)
-                    },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent), // Transparent background
-                elevation = null, // No shadow effect
-                modifier = Modifier.size(70.dp) // Ensures button size fits image
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.home),
-                    contentDescription = "Home",
-                    modifier = Modifier.fillMaxSize() // Ensures it fits inside button
-                )
-            }
+            NavBarItem(
+                iconId = R.drawable.home,
+                description = "Home",
+                isSelected = currentRoute == Screens.MainScreen.route,
+                onClick = { navController.navigate(Screens.MainScreen.route) }
+            )
 
-            Spacer(modifier = Modifier.weight(1f)) // Pushes items apart evenly
+            Spacer(modifier = Modifier.weight(1f))
 
             // Profile Button
-            Button(
-                onClick = {navController.navigate(Screens.Profil.route)},
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                elevation = null,
-                modifier = Modifier.size(70.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "Profile",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            NavBarItem(
+                iconId = R.drawable.profile,
+                description = "Profile",
+                isSelected = currentRoute == Screens.Profil.route,
+                onClick = { navController.navigate(Screens.Profil.route) }
+            )
         }
 
         FloatingActionButton(
-            onClick = { /* TODO: Handle Microphone Click */ },
+            onClick = { /* TODO */ },
             shape = CircleShape,
             contentColor = Color(0xff3aafa9),
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
@@ -125,5 +139,37 @@ fun NavBar(navController: NavController){
             )
         }
     }
-
 }
+
+
+
+object RetrofitClient {
+    private const val BASE_URL = "http://localhost:3000/"
+
+    val instance: ApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
+    }
+}
+
+fun fetchPhoneNumber(userId: String) {
+    val call = RetrofitClient.instance.getPhoneNumber(userId)
+
+    call.enqueue(object : Callback<ApiResponse> {
+        override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+            if (response.isSuccessful) {
+                println("Phone Number: ${response.body()?.phone}")
+            } else {
+                println("Error: ${response.errorBody()?.string()}")
+            }
+        }
+
+        override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+            println("Network Error: ${t.message}")
+        }
+    })
+}
+

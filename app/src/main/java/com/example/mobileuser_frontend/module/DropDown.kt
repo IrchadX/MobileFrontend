@@ -11,6 +11,7 @@ class DropDown {
     var enabled by mutableStateOf(false)
     var value by mutableStateOf("Emplacement actuel")
     var selectedIndex by mutableStateOf(-1)
+    var items by mutableStateOf(listOf<ListItems>())
     var size by mutableStateOf(Size.Zero) //To make the list Size equal the field
     val icon: Int
         @Composable get() = if (enabled){
@@ -18,19 +19,13 @@ class DropDown {
         }else{
             R.drawable.arrowup
         }
-    val items = (1..5).map{
-        "Option$it"
-    }
 
     fun onEnabled(newValue:Boolean){
         enabled =newValue
     }
-    fun onSelectedIndex(newValue:Int){
-        selectedIndex =newValue
-        value = items[selectedIndex]
-    }
     fun onSize(newValue: Size){
         size =newValue
     }
+
 
 }

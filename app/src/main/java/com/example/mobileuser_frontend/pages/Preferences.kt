@@ -1,18 +1,21 @@
 package com.example.mobileuser_frontend.pages
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
@@ -115,7 +118,7 @@ fun Preferences(navController: NavController) {
             }*/
             val dropdownState = remember { DropDown() }
 
-            StableDropdown(dropdownState = dropdownState)
+            //StableDropdown(dropdownState = dropdownState)
             Text(
                 text = "Genre de Voix",
                 color = Color(0xff17252a),
@@ -160,7 +163,7 @@ fun Preferences(navController: NavController) {
                     )
             }*/
 
-            StableDropdown(dropdownState = dropdownState)
+            //StableDropdown(dropdownState = dropdownState)
 
             Divider(
                 color = Color.Gray.copy(alpha = 0.3f),
@@ -228,7 +231,7 @@ fun Preferences(navController: NavController) {
 
 
             }*/
-                StableDropdown(dropdownState = dropdownState)
+                //StableDropdown(dropdownState = dropdownState)
                 Divider(
                     color = Color.Gray.copy(alpha = 0.3f),
                     thickness = 2.dp,

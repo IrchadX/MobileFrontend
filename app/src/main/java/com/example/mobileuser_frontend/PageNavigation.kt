@@ -1,14 +1,22 @@
 package com.example.mobileuser_frontend
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.mobileuser_frontend.pages.*
+import com.example.mobileuser_frontend.pages.AddAidant
+import com.example.mobileuser_frontend.pages.Appareil
+import com.example.mobileuser_frontend.pages.Appel
+import com.example.mobileuser_frontend.pages.HomeScreen
+import com.example.mobileuser_frontend.pages.Information
+import com.example.mobileuser_frontend.pages.Navigation
+import com.example.mobileuser_frontend.pages.Parametre
+import com.example.mobileuser_frontend.pages.Preferences
+import com.example.mobileuser_frontend.pages.Profil
 
 @Composable
-fun PageNavigation() {
-    val navController = rememberNavController()
+fun PageNavigation(navController: NavHostController) {
+
     NavHost(navController = navController, startDestination = Screens.MainScreen.route){
         composable(route = Screens.MainScreen.route){
             HomeScreen(navController = navController)

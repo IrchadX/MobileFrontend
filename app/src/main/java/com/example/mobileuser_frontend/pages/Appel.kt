@@ -1,10 +1,40 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.example.mobileuser_frontend.pages
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,32 +42,45 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.R
+import com.example.mobileuser_frontend.functions.fetchPhoneNumber
+import com.example.mobileuser_frontend.functions.makePhoneCall
 import com.example.mobileuser_frontend.module.DropDown
+import com.example.mobileuser_frontend.viewmodel.EmergencyViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 
 /*@Preview
 @Composable
 private fun AppelPreview() {
     Appel()
 }*/
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Appel(navController: NavController) {
+
+    LocalContext.current
+
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     Column(
-        verticalArrangement = Arrangement.spacedBy(40.dp),
+
         modifier = Modifier
             .fillMaxWidth()
             .height(screenHeight-130.dp)
+            .verticalScroll(rememberScrollState())
             .background(color = Color(0xfffcfffe)).padding(top = 20.dp, bottom = 20.dp, start = 5.dp, end = 5.dp)
     ) {
         Row(
@@ -87,11 +130,40 @@ fun Appel(navController: NavController) {
                 )
             }
         }
+
+        val context = LocalContext.current
+        val callPermissionState = rememberPermissionState(android.Manifest.permission.CALL_PHONE)
+
         Button(
-            onClick = { /*TODO*/ },
+                onClick = {
+                    when {
+                        callPermissionState.status.isGranted -> {
+                            // Permission already granted - make the call
+                            fetchPhoneNumber("66") { phone ->
+                                if (phone != null) {
+                                    makePhoneCall(context,phone)
+                                } else {
+                                    Toast.makeText(context, "Error: Try again Please", Toast.LENGTH_LONG).show()
+                                }
+                            }
+
+                        }
+                        callPermissionState.status.shouldShowRationale -> {
+                            Toast.makeText(
+                                context,
+                                "Phone call permission is required to make calls",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        else -> {
+                            // Request permission
+                            callPermissionState.launchPermissionRequest()
+                        }
+                    }
+                },
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .fillMaxHeight(0.3f)
                 .clip(RoundedCornerShape(8.dp))
                 .padding(all = 5.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff17252a))
@@ -113,14 +185,28 @@ fun Appel(navController: NavController) {
             ),
             modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
         )
-        val dropdownState = remember { DropDown() }
 
-        StableDropdown(dropdownState = dropdownState)
+
+
+        EmergencyDropdown()
 
     }
 }
+
 @Composable
-fun StableDropdown(dropdownState: DropDown) {
+fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
+    val dropdownState = remember { DropDown() }
+    val items by viewModel.dropdownItems
+
+    val context = LocalContext.current
+    val callPermissionState = rememberPermissionState(android.Manifest.permission.CALL_PHONE)
+
+
+    dropdownState.value = "Appel d'urgence"
+    // Update items when they are ready
+    LaunchedEffect(items) {
+        dropdownState.items = items
+    }
     val density = LocalDensity.current
     val backgroundColor = Color(0xFF2B7A78).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
     val borderColor = Color(0xFF3AAFA9) // Your teal border color
@@ -131,12 +217,6 @@ fun StableDropdown(dropdownState: DropDown) {
             value = dropdownState.value,
             onValueChange = {},
             readOnly = true,
-            placeholder = {
-                Text(
-                    "Choisir un service",
-                    color = Color(0xFF17252A).copy(alpha = 0.6f)
-                )
-            },
             trailingIcon = {
                 Icon(
                     painter = painterResource(id = dropdownState.icon),
@@ -176,27 +256,17 @@ fun StableDropdown(dropdownState: DropDown) {
             onDismissRequest = { dropdownState.onEnabled(false) },
             modifier = Modifier
                 .width(with(density) { dropdownState.size.width.toDp() })
-                .offset(y = with(density) { dropdownState.size.height.toDp() })
-                .background(backgroundColor)
-                .border(
-                    BorderStroke(1.dp, borderColor),
-                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                )
+                .heightIn(max = 200.dp) // enables scrolling if needed
         ) {
-            dropdownState.items.forEachIndexed { index, item ->
-                DropdownMenuItem(
-                    onClick = {
-                        dropdownState.onSelectedIndex(index)
+            Column() {
+                dropdownState.items.forEach { item ->
+                    DropdownMenuItem(onClick = {
                         dropdownState.onEnabled(false)
-                    },
-                    content = {
-                        Text(
-                            text = item,
-                            color = Color(0xFF17252A),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        makePhoneCall(context, item.number)
+                    }) {
+                        Text(text = item.label)
                     }
-                )
+                }
             }
         }
     }
