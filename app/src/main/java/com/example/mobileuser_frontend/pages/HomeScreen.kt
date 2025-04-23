@@ -26,14 +26,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.R
 import com.example.mobileuser_frontend.Screens
+import com.example.mobileuser_frontend.module.fontSizeTitle
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
     Box (
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +82,7 @@ fun HomeScreen(navController: NavController) {
                         text = "S.O.S",
                         color = Color.White,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = 55.sp)
+                        style = TextStyle(fontSize = fontSizeTitle())
                     )
                 }
 
@@ -97,7 +99,7 @@ fun HomeScreen(navController: NavController) {
                         text = "Assistance",
                         color = Color.White,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = 55.sp)
+                        style = TextStyle(fontSize = fontSizeTitle())
                     )
                 }
 
@@ -114,7 +116,7 @@ fun HomeScreen(navController: NavController) {
                         text = "Naviguer",
                         color = Color.White,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = 55.sp)
+                        style = TextStyle(fontSize = fontSizeTitle())
                     )
                 }
             }

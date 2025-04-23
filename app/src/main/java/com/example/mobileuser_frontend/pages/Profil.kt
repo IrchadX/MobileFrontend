@@ -27,10 +27,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.Screens
 import com.example.mobileuser_frontend.functions.fetchUserInfo
+import com.example.mobileuser_frontend.module.fontSizeSubTitle
+import com.example.mobileuser_frontend.module.fontSizeTitle
 
 /*@Preview
 @Composable
@@ -39,13 +40,16 @@ private fun ProfilPreview() {
 }*/
 @Composable
 fun Profil(navController: NavController) {
+
+
     val context = LocalContext.current
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val id = "67"
     Box (
         modifier = Modifier.fillMaxSize()
             .pointerInput(Unit) {
                 detectHorizontalDragGestures { _, dragAmount ->
-                    if (dragAmount > 100) {
+                    if (dragAmount < -60) {
                         // Swipe right to go back to Home
                         navController.navigate(Screens.MainScreen.route){popUpTo(0)}
                     }
@@ -59,7 +63,7 @@ fun Profil(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             var value = ""
-            fetchUserInfo("66") {name ->
+            fetchUserInfo(id) {name ->
                 if (name != null) {
                     value = name
                 } else {
@@ -70,7 +74,7 @@ fun Profil(navController: NavController) {
                 text = "Bienvenue $value",
                 color = Color(0xff17252a),
                 style = TextStyle(
-                    fontSize = 36.sp,
+                    fontSize = fontSizeTitle(),
                     fontWeight = FontWeight.Bold,
                 ),
                 modifier = Modifier
@@ -95,7 +99,7 @@ fun Profil(navController: NavController) {
                         text = "Paramètres",
                         color = Color.White,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = 40.sp)
+                        style = TextStyle(fontSize = fontSizeSubTitle())
                     )
                 }
 
@@ -112,7 +116,7 @@ fun Profil(navController: NavController) {
                         text = "Appairage",
                         color = Color.White,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = 40.sp)
+                        style = TextStyle(fontSize = fontSizeSubTitle())
                     )
                 }
 
@@ -129,7 +133,7 @@ fun Profil(navController: NavController) {
                         text = "Appareil",
                         color = Color.White,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = 40.sp)
+                        style = TextStyle(fontSize = fontSizeSubTitle())
                     )
                 }
             }

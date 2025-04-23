@@ -1,6 +1,8 @@
 package com.example.mobileuser_frontend.functions
 
 import com.example.mobileuser_frontend.API.ApiResponse
+import com.example.mobileuser_frontend.API.PasswordRequest
+import com.example.mobileuser_frontend.API.ProfilRequest
 import com.example.mobileuser_frontend.module.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,14 +20,15 @@ fun splitFullName(fullName: String): Pair<String, String> { // Now both return n
 //Function to change the user data
 fun changeUserData(userId: String, name: String, callback: (String?) -> Unit) {
     val (familyName, firstName) = splitFullName(name)
-    val change = RetrofitClient.instance.changeDataUser(userId, firstName, familyName)
+    val request = ProfilRequest(userId, firstName, familyName)
+    val change = RetrofitClient.instance.changeDataUser(request)
 
     change.enqueue(object : Callback<ApiResponse> {
         override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
             if (response.isSuccessful) {
                 val mes= response.body()?.data
                 println("Message: $mes")
-                callback(mes) // Send phone number to callback
+                callback(mes)
             } else {
                 println("Error: ${response.errorBody()?.string()}")
                 callback(null)
@@ -40,14 +43,38 @@ fun changeUserData(userId: String, name: String, callback: (String?) -> Unit) {
 }
 //Function to change the user password
 fun changeUserPassword(userId: String, pwd: String, callback: (String?) -> Unit) {
-    val change = RetrofitClient.instance.changePasswordUser(userId, pwd)
+    val request = PasswordRequest(userId,pwd)
+    val change = RetrofitClient.instance.changePasswordUser(request)
 
     change.enqueue(object : Callback<ApiResponse> {
         override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
             if (response.isSuccessful) {
                 val mes= response.body()?.data
                 println("Message: $mes")
-                callback(mes) // Send phone number to callback
+                callback(mes)
+            } else {
+                println("Error: ${response.errorBody()?.string()}")
+                callback(null)
+            }
+        }
+
+        override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+            println("Network Error: ${t.message}")
+            callback(null)
+        }
+    })
+}
+//Function to check user password
+fun checkUserPassword(userId: String, pwd: String, callback: (String?) -> Unit) {
+    val request = PasswordRequest(userId,pwd)
+    val change = RetrofitClient.instance.checkPasswordUser(request)
+
+    change.enqueue(object : Callback<ApiResponse> {
+        override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+            if (response.isSuccessful) {
+                val mes= response.body()?.data
+                println("Message: $mes")
+                callback(mes)
             } else {
                 println("Error: ${response.errorBody()?.string()}")
                 callback(null)
