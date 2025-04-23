@@ -41,11 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.mobileuser_frontend.API.ApiService
 import com.example.mobileuser_frontend.module.NavBarItem
 import com.example.mobileuser_frontend.ui.theme.MobileUser_FrontendTheme
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -156,7 +153,7 @@ fun NavBar(navController: NavController) {
 
 
 
-object RetrofitClient {
+/*object RetrofitClient {
     private const val BASE_URL = "http://localhost:3000/"
 
     val instance: ApiService by lazy {
@@ -166,4 +163,4 @@ object RetrofitClient {
             .build()
             .create(ApiService::class.java)
     }
-}
+}*/
