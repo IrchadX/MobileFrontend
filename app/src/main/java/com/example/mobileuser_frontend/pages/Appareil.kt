@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -96,7 +96,7 @@ fun Appareil(navController: NavController) {
                 text = "État de la batterie",
                 fontSize = fontSizeSmallText(),
                 color = Color(0xff17252a),
-                style = MaterialTheme.typography.h5)
+                style = MaterialTheme.typography.headlineSmall)
             Box(
                 modifier = Modifier
                     .requiredWidth(width = 280.dp)
@@ -288,7 +288,7 @@ fun Appareil(navController: NavController) {
             Button(
                 onClick = { /* TODO: Handle Click Action */ },
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xffcc2222)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp) // Increased height for better UI

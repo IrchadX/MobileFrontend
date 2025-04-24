@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,7 +76,7 @@ fun HomeScreen(navController: NavController) {
                         .weight(1f)
                         .clip(RoundedCornerShape(8.dp))
                         .padding(all = 10.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xffcc2222))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222))
                 ) {
                     Text(
                         text = "S.O.S",
@@ -93,7 +93,7 @@ fun HomeScreen(navController: NavController) {
                         .weight(1f)
                         .clip(RoundedCornerShape(8.dp))
                         .padding(all = 10.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff17252a))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252a))
                 ) {
                     Text(
                         text = "Assistance",
@@ -110,7 +110,7 @@ fun HomeScreen(navController: NavController) {
                         .weight(1f)
                         .clip(RoundedCornerShape(8.dp))
                         .padding(all = 10.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff3aafa9))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3aafa9))
                 ) {
                     Text(
                         text = "Naviguer",

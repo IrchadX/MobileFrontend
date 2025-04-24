@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.mobileuser_frontend.R
 import com.example.mobileuser_frontend.functions.changeUserData
 import com.example.mobileuser_frontend.functions.changeUserPassword
@@ -47,8 +47,9 @@ import com.example.mobileuser_frontend.module.fontSizeSubTitle
 private fun InformationPreview() {
     Information()
 }*/
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Information(navController: NavController) {
+fun Information() {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     var changed = false
@@ -136,11 +137,11 @@ fun Information(navController: NavController) {
                         ),
                         singleLine = true,
                         colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.Transparent,
+                            containerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             cursorColor = Color(0xff17252a)
-                        )
+                            )
                     )
                             }
             Divider(
@@ -193,7 +194,7 @@ fun Information(navController: NavController) {
                     ),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
+                        containerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         cursorColor = Color(0xff17252a)
@@ -237,7 +238,7 @@ fun Information(navController: NavController) {
                     ),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
+                        containerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         cursorColor = Color(0xff17252a)
@@ -285,8 +286,8 @@ fun Information(navController: NavController) {
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3AAFA9)),
-                elevation = ButtonDefaults.elevation(5.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
+                elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
             ) {
                 Text(
                     text = "Sauvegarder",

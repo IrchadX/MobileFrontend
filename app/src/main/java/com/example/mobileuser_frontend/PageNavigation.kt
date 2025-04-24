@@ -31,7 +31,7 @@ fun PageNavigation(navController: NavHostController) {
             Parametre(navController = navController)
         }
         composable(route = Screens.Information.route){
-            Information(navController = navController)
+            Information()
         }
         composable(route = Screens.Appareil.route){
             Appareil(navController = navController)

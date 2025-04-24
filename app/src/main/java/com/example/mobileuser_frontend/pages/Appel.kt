@@ -4,6 +4,8 @@ package com.example.mobileuser_frontend.pages
 
 
 
+import android.Manifest
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -111,7 +114,7 @@ fun Appel(navController: NavController) {
                     text = "Partager Position",
                     color = Color(0xff17252a),
                     lineHeight = 8.em,
-                    style = MaterialTheme.typography.h5,
+                    style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {  }
@@ -130,7 +133,7 @@ fun Appel(navController: NavController) {
         }
 
         val context = LocalContext.current
-        val callPermissionState = rememberPermissionState(android.Manifest.permission.CALL_PHONE)
+        val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
         Button(
                 onClick = {
@@ -164,7 +167,7 @@ fun Appel(navController: NavController) {
                 .fillMaxHeight(0.3f)
                 .clip(RoundedCornerShape(8.dp))
                 .padding(all = 5.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff17252a))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252a))
         ) {
             Text(
                 text = "Demande D'aide",
@@ -191,13 +194,14 @@ fun Appel(navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
     val dropdownState = remember { DropDown() }
     val items by viewModel.dropdownItems
 
     val context = LocalContext.current
-    val callPermissionState = rememberPermissionState(android.Manifest.permission.CALL_PHONE)
+    val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
 
     dropdownState.value = "Appel d'urgence"
@@ -237,7 +241,7 @@ fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
                     shape = RoundedCornerShape(8.dp)
                 ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color.Transparent,
+                containerColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedBorderColor = borderColor,
                 textColor = Color(0xFF17252A),
@@ -258,10 +262,19 @@ fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
         ) {
             Column() {
                 dropdownState.items.forEach { item ->
-                    DropdownMenuItem(onClick = {
-                        dropdownState.onEnabled(false)
-                        makePhoneCall(context, item.number)
-                    }) {
+                    DropdownMenuItem(
+                        onClick = {
+                            dropdownState.onEnabled(false)
+                            makePhoneCall(context, item.number)
+                        },
+                        text = TODO(),
+                        modifier = TODO(),
+                        leadingIcon = TODO(),
+                        trailingIcon = TODO(),
+                        enabled = TODO(),
+                        colors = TODO(),
+                        contentPadding = TODO()
+                    ) {
                         Text(text = item.label)
                     }
                 }

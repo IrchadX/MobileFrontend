@@ -1,11 +1,22 @@
 package com.example.mobileuser_frontend.pages
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,8 +80,8 @@ fun AddAidant(navController: NavController) {
             Button(
                 onClick = { /* TODO: Handle Microphone Click */ },
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff3aafa9)),
-                elevation = ButtonDefaults.elevation(defaultElevation = 0.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3aafa9)),
+                elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 0.dp),
                 modifier = Modifier .padding(20.dp)
                     .align(Alignment.CenterHorizontally)
                     .size(100.dp) // Standardized size

@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,11 +103,10 @@ fun CustomDropdown(
                     shape = RoundedCornerShape(8.dp)
                 ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
                 focusedBorderColor = borderColor,
-                textColor = textColor,
-                placeholderColor = textColor.copy(alpha = 0.6f)
+                textColor = Color(0xFF17252A),
+                placeholderColor = Color(0xFF17252A).copy(alpha = 0.6f)
             ),
             textStyle = textStyle
         )

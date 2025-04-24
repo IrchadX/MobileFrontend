@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -124,7 +124,7 @@ fun Preferences(navController: NavController) {
 
                     )
             }
-            val dropdownState = remember { DropDown() }
+            remember { DropDown() }
 
             //StableDropdown(dropdownState = dropdownState)
             Text(
@@ -173,10 +173,10 @@ fun Preferences(navController: NavController) {
 
             //StableDropdown(dropdownState = dropdownState)
 
-            Divider(
-                color = Color.Gray.copy(alpha = 0.3f),
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
                 thickness = 2.dp,
-                modifier = Modifier.fillMaxWidth()
+                color = Color.Gray.copy(alpha = 0.3f)
             )
 //Vibration Section
             Text(
@@ -240,10 +240,10 @@ fun Preferences(navController: NavController) {
 
             }*/
                 //StableDropdown(dropdownState = dropdownState)
-                Divider(
-                    color = Color.Gray.copy(alpha = 0.3f),
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
                     thickness = 2.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    color = Color.Gray.copy(alpha = 0.3f)
                 )
 
             }
@@ -253,8 +253,8 @@ fun Preferences(navController: NavController) {
                     .fillMaxWidth()
                     .height(40.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3AAFA9)),
-                elevation = ButtonDefaults.elevation(5.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
+                elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
             ) {
                 Text(
                     text = "Sauvegarder",
