@@ -73,7 +73,6 @@ fun Navigation(navController: NavController) {
                 )
             }
             Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
                 modifier = Modifier
                     .fillMaxWidth()
             ) {

@@ -28,7 +28,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -240,12 +239,12 @@ fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
                     BorderStroke(1.dp, borderColor),
                     shape = RoundedCornerShape(8.dp)
                 ),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                containerColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedBorderColor = borderColor,
-                textColor = Color(0xFF17252A),
-                placeholderColor = Color(0xFF17252A).copy(alpha = 0.6f)
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,  // replaces containerColor
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color(0xFF17252A)
             ),
             textStyle = TextStyle(
                 fontSize = 16.sp
@@ -262,21 +261,7 @@ fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
         ) {
             Column() {
                 dropdownState.items.forEach { item ->
-                    DropdownMenuItem(
-                        onClick = {
-                            dropdownState.onEnabled(false)
-                            makePhoneCall(context, item.number)
-                        },
-                        text = TODO(),
-                        modifier = TODO(),
-                        leadingIcon = TODO(),
-                        trailingIcon = TODO(),
-                        enabled = TODO(),
-                        colors = TODO(),
-                        contentPadding = TODO()
-                    ) {
-                        Text(text = item.label)
-                    }
+
                 }
             }
         }

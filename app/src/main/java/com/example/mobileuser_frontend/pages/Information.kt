@@ -136,12 +136,13 @@ fun Information() {
                             color = Color(0xff17252a)
                         ),
                         singleLine = true,
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,  // replaces containerColor
+                            unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = Color(0xff17252a)
-                            )
+                            cursorColor = Color(0xFF17252A)
+                        )
                     )
                             }
             Divider(
@@ -193,11 +194,12 @@ fun Information() {
                         color = Color(0xff17252a)
                     ),
                     singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,  // replaces containerColor
+                        unfocusedContainerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color(0xff17252a)
+                        cursorColor = Color(0xFF17252A)
                     )
                 )
             }
@@ -237,11 +239,12 @@ fun Information() {
                         color = Color(0xff17252a)
                     ),
                     singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,  // replaces containerColor
+                        unfocusedContainerColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color(0xff17252a)
+                        cursorColor = Color(0xFF17252A)
                     )
                 )
             }

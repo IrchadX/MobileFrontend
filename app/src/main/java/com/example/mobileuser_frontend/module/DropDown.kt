@@ -102,11 +102,12 @@ fun CustomDropdown(
                     BorderStroke(1.dp, borderColor),
                     shape = RoundedCornerShape(8.dp)
                 ),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                unfocusedBorderColor = Color.Transparent,
-                focusedBorderColor = borderColor,
-                textColor = Color(0xFF17252A),
-                placeholderColor = Color(0xFF17252A).copy(alpha = 0.6f)
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,  // replaces containerColor
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color(0xFF17252A)
             ),
             textStyle = textStyle
         )

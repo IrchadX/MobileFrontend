@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,18 +22,19 @@ class Dialog {
     var text by mutableStateOf("")
     var icon: Int = 0
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun display() {
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = {
                     showDialog = false
-                    onDismiss() // Optional dismiss logic
+                    onDismiss()
                 },
-                text = {
+                content = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp) // spacing between icon and text
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = icon),
@@ -41,8 +43,7 @@ class Dialog {
                         )
                         Text(text = text)
                     }
-                },
-                buttons = {} // No buttons
+                }
             )
         }
     }
