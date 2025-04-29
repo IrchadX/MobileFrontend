@@ -1,9 +1,10 @@
 package com.example.mobileuser_frontend.pages
 
 
-import android.widget.Toast
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,12 +17,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,19 +37,27 @@ import com.example.mobileuser_frontend.Screens
 import com.example.mobileuser_frontend.functions.fetchUserInfo
 import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.module.fontSizeTitle
+import com.example.mobileuser_frontend.viewmodel.AuthViewModel
+import kotlinx.coroutines.flow.firstOrNull
 
 /*@Preview
 @Composable
 private fun ProfilPreview() {
     Profil()
 }*/
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun Profil(navController: NavController) {
-
+fun Profil(navController: NavController, viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+    var id by remember { mutableStateOf("") }
+    var value by remember { mutableStateOf("") }
 
     val context = LocalContext.current
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val id = "67"
+    LaunchedEffect(Unit) {
+         id = viewModel.authRepository.getUserId().firstOrNull() ?: ""
+        // now you can use id
+    }
+
+
     Box (
         modifier = Modifier.fillMaxSize()
             .pointerInput(Unit) {
@@ -58,18 +71,25 @@ fun Profil(navController: NavController) {
     ){
         Column(
             modifier = Modifier
-                .height(screenHeight - 130.dp)
+                .fillMaxHeight()
                 .background(color = Color(0xfffcfffe)),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            var value = ""
-            fetchUserInfo(id) {name ->
-                if (name != null) {
-                    value = name
-                } else {
-                    Toast.makeText(context, "Error: Refresh Page", Toast.LENGTH_LONG).show()
+            LaunchedEffect(id) {  // 'id' as key to restart when id changes
+                fetchUserInfo(id) { name ->
+                    value = name ?: "" // This will trigger recomposition
                 }
-            }
+
+                        /*
+
+                        else {
+                            Toast.makeText(context, "Error: Refresh Page", Toast.LENGTH_LONG).show()
+                        }
+                         */
+                    }
+
+
             Text(
                 text = "Bienvenue $value",
                 color = Color(0xff17252a),
@@ -91,7 +111,8 @@ fun Profil(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .padding(all = 15.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3AAFA9))
                 ) {
@@ -108,7 +129,8 @@ fun Profil(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .padding(all = 15.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252A))
                 ) {
@@ -125,7 +147,8 @@ fun Profil(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .padding(all = 15.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3AAFA9))
                 ) {

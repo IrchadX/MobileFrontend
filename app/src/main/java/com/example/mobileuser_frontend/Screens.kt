@@ -3,6 +3,8 @@ package com.example.mobileuser_frontend
 
 sealed class Screens (val route: String){
     object MainScreen : Screens("HomeScreen")
+    object SignUpScreen : Screens("SignUpScreen")
+    object SignInScreen : Screens("SignInScreen")
     object NavigationScreen : Screens("Navigation")
     object Profil : Screens("Profil")
     object Parametre : Screens("Parametre")

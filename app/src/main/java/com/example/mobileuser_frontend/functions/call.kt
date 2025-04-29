@@ -7,7 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.example.mobileuser_frontend.API.ApiResponse
+import com.example.mobileuser_frontend.data.model.ApiResponse
 import com.example.mobileuser_frontend.module.ListItems
 import com.example.mobileuser_frontend.module.RetrofitClient
 import retrofit2.Call

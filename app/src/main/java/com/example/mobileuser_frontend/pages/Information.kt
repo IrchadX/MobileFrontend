@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,8 +22,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +43,9 @@ import com.example.mobileuser_frontend.functions.fetchUserInfo
 import com.example.mobileuser_frontend.module.Dialog
 import com.example.mobileuser_frontend.module.fontSizeSmallText
 import com.example.mobileuser_frontend.module.fontSizeSubTitle
+import com.example.mobileuser_frontend.module.fontSizeText
+import com.example.mobileuser_frontend.viewmodel.AuthViewModel
+import kotlinx.coroutines.flow.firstOrNull
 
 
 /*@Preview
@@ -49,7 +55,7 @@ private fun InformationPreview() {
 }*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Information() {
+fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     var changed = false
@@ -58,7 +64,12 @@ fun Information() {
     val pwd = remember { mutableStateOf<String>("") }
     var newpwd = remember { mutableStateOf<String>("") }
     val dialog = remember { Dialog() } //For pop ups
-    val id ="67"
+
+    var id by remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        id = viewModel.authRepository.getUserId().firstOrNull() ?: ""
+        // now you can use id
+    }
 
     LaunchedEffect(Unit) {
         fetchUserInfo(id) { name ->
@@ -68,20 +79,19 @@ fun Information() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .fillMaxHeight()
             .fillMaxWidth()
-            .height(screenHeight - 10.dp)
             .background(color = Color(0xfffcfffe))
     ) {
         Text(
             text = "Informations Personnelles",
             color = Color(0xff17252a),
             style = TextStyle(
-                fontSize = fontSizeSubTitle(),
+                fontSize = fontSizeText(),
                 fontWeight = FontWeight.Bold,
             ),
             modifier = Modifier
                 .align(Alignment.Start)
-                .padding(5.dp),
         )
 
 
@@ -255,37 +265,71 @@ fun Information() {
             )
             Button(
                 onClick = {
-                    if (!changed) {
-                        text.value?.let {
-                            changeUserData(id, it) { mess ->
-                                dialog.text = mess ?: "Une erreur s'est produit , Veuillez réessayer !"
-                                dialog.icon = R.drawable.iconconfirm
-                                dialog.showDialog = true
+                    // Track completion states
+                    var nameChangeCompleted = false
+                    var passwordChangeCompleted = false
+                    var success = true
+                    val messages = mutableListOf<String>()
+                    var icon = R.drawable.iconconfirm
 
+                    fun checkAndShowPopup() {
+                        if ((!changed || nameChangeCompleted) &&
+                            (pwd.value.isBlank() || newpwd.value.isBlank() || passwordChangeCompleted)) {
+
+                            val finalMessage = when {
+                                messages.isNotEmpty() -> messages.joinToString("\n")
+                                else -> "Opération réussie"
                             }
+
+                            dialog.text = finalMessage
+                            dialog.icon = icon
+                            dialog.showDialog = true
                         }
                     }
 
-                    // 2. Check if both password fields are filled
+                    // Handle name change if needed
+                    if (!changed && text.value != null) {
+                        changeUserData(id, text.value!!) { mess ->
+                            nameChangeCompleted = true
+                            if (mess == null || !mess.contains("succès", ignoreCase = true)) {
+                                success = false
+                                icon = R.drawable.iconerror
+                            }
+                            mess?.let { messages.add(it) }
+                            checkAndShowPopup()
+                        }
+                    } else {
+                        nameChangeCompleted = true
+                    }
+
+                    // Handle password change if needed
                     if (pwd.value.isNotBlank() && newpwd.value.isNotBlank()) {
                         checkUserPassword(id, pwd.value) { mes ->
-                            if(mes == "true"){
+                            if (mes == "true") {
                                 changeUserPassword(id, newpwd.value) { result ->
-                                    dialog.text = result ?: "Une erreur s'est produit , Veuillez réessayer !"
-                                    dialog.icon = R.drawable.iconconfirm
-                                    dialog.showDialog = true
-
-                                } }
-                                else{
-                                    dialog.text = mes?: "Une erreur s'est produit , Veuillez réessayer !"
-                                    dialog.icon = R.drawable.iconerror
-                                    dialog.showDialog = true
+                                    passwordChangeCompleted = true
+                                    if (result == null || !result.contains("succès", ignoreCase = true)) {
+                                        success = false
+                                        icon = R.drawable.iconerror
+                                    }
+                                    result?.let { messages.add(it) }
+                                    checkAndShowPopup()
                                 }
-
+                            } else {
+                                passwordChangeCompleted = true
+                                success = false
+                                icon = R.drawable.iconerror
+                                mes?.let { messages.add(it) }
+                                checkAndShowPopup()
                             }
                         }
-                    },
-                modifier = Modifier
+                    } else {
+                        passwordChangeCompleted = true
+                    }
+                },
+
+
+                        modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(8.dp),

@@ -1,29 +1,20 @@
 package com.example.mobileuser_frontend.pages
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
@@ -32,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.mobileuser_frontend.module.DropDown
+import com.example.mobileuser_frontend.module.CustomDropdown
 
 
 /*@Preview
@@ -91,42 +82,15 @@ fun Preferences(navController: NavController) {
                 modifier = Modifier
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = Color(0xff2b7a78).copy(alpha = 0.05f))
-                    .border(
-                        border = BorderStroke(1.dp, Color(0xff17252a).copy(alpha = 0.12f)),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(
-                        horizontal = 15.dp,
-                    ),
-            ) {
-                Text(
-                    text = "Choisissez votre langue préférée",
-                    color = Color(0xff17252a),
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                    ),
-                    modifier = Modifier
-                        .wrapContentHeight(align = Alignment.CenterVertically)
-                )
-                Icon(
-                    imageVector = Icons.Rounded.ArrowDropDown,
-                    contentDescription = "More",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(55.dp),
 
-                    )
-            }
-            remember { DropDown() }
+            CustomDropdown(
+                label = "",
+                items = poiOptions,
+                initialValue = "Choisir Votre Langue préférée",
+                onItemSelected = {
+                },
+            )
 
-            //StableDropdown(dropdownState = dropdownState)
             Text(
                 text = "Genre de Voix",
                 color = Color(0xff17252a),
@@ -137,41 +101,13 @@ fun Preferences(navController: NavController) {
                 modifier = Modifier
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
-            /*Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = Color(0xff2b7a78).copy(alpha = 0.05f))
-                    .border(
-                        border = BorderStroke(1.dp, Color(0xff17252a).copy(alpha = 0.12f)),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(
-                        horizontal = 15.dp,
-                    ),
-            ) {
-                Text(
-                    text = "Choisissez votre voix préférée",
-                    color = Color(0xff17252a),
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                    ),
-                    modifier = Modifier
-                        .wrapContentHeight(align = Alignment.CenterVertically)
-                )
-                Icon(
-                    imageVector = Icons.Rounded.ArrowDropDown,
-                    contentDescription = "More",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(55.dp),
-
-                    )
-            }*/
-
-            //StableDropdown(dropdownState = dropdownState)
+            CustomDropdown(
+                label = "",
+                items = poiOptions,
+                initialValue = "Choisir Votre voix préférée",
+                onItemSelected = {
+                },
+            )
 
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
@@ -204,42 +140,14 @@ fun Preferences(navController: NavController) {
                     modifier = Modifier
                         .wrapContentHeight(align = Alignment.CenterVertically)
                 )
-                /* Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth().height(60.dp)
-                        .clip(shape = RoundedCornerShape(8.dp))
-                        .background(color = Color(0xff2b7a78).copy(alpha = 0.05f))
-                        .border(
-                            border = BorderStroke(1.dp, Color(0xff17252a).copy(alpha = 0.12f)),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(
-                            horizontal = 15.dp,
-                        ),
-                ) {
-                    Text(
-                        text = "Choisissez votre langue préférée",
-                        color = Color(0xff17252a),
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                        ),
-                        modifier = Modifier
-                            .wrapContentHeight(align = Alignment.CenterVertically)
-                    )
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowDropDown,
-                        contentDescription = "More",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(55.dp),
 
-                        )
-                }
-
-
-            }*/
-                //StableDropdown(dropdownState = dropdownState)
+                CustomDropdown(
+                    label = "",
+                    items = poiOptions,
+                    initialValue = "Choisir Votre niveau de sensibilité",
+                    onItemSelected = {
+                    },
+                )
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     thickness = 2.dp,

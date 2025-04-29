@@ -1,6 +1,6 @@
 package com.example.mobileuser_frontend.functions
 
-import com.example.mobileuser_frontend.API.DeviceData
+import com.example.mobileuser_frontend.data.model.DeviceData
 import com.example.mobileuser_frontend.module.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback

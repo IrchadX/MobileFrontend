@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,7 +46,6 @@ fun Navigation(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(screenHeight-130.dp)
             .background(color = Color(0xfffcfffe))
             .padding(top = 10.dp, start = 20.dp, end = 20.dp),
     ) {
@@ -73,13 +71,13 @@ fun Navigation(navController: NavController) {
                 )
             }
             Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
                 Text(
                     text = "Position actuelle",
                     color = Color(0xff17252a),
-                    lineHeight = 5.43.em,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -87,7 +85,6 @@ fun Navigation(navController: NavController) {
                 Text(
                     text = "Cyberespace",
                     color = Color(0xff17252a),
-                    lineHeight = 6.51.em,
                     style = TextStyle(
                         fontSize = 20.sp
                     ),
@@ -111,12 +108,11 @@ fun Navigation(navController: NavController) {
 
 
         CustomDropdown(
-            label = "Choisir point de départ",
+            label = "",
             items = poiOptions,
-            initialValue = "Choisir POI",
+            initialValue = "Choisir Point de départ",
             onItemSelected = {
             },
-            modifier = Modifier.padding(16.dp)
         )
         Text(
             text = "Point d'arrivée",
@@ -131,12 +127,11 @@ fun Navigation(navController: NavController) {
         //Point d'arrivée
 
         CustomDropdown(
-            label = "Choisir Point de départ",
+            label = "",
             items = poiOptions,
-            initialValue = "Choisir POI",
+            initialValue = "Choisir Point d'arrivée",
             onItemSelected = {
             },
-            modifier = Modifier.padding(16.dp)
         )
     }
 }

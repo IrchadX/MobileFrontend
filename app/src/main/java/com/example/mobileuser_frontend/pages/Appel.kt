@@ -15,9 +15,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -75,13 +76,14 @@ private fun AppelPreview() {
 fun Appel(navController: NavController) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val scrollvertical = rememberScrollState()
     Column(
 
         modifier = Modifier
             .fillMaxWidth()
-            .height(screenHeight-130.dp)
+            .fillMaxHeight()
             .verticalScroll(rememberScrollState())
-            .background(color = Color(0xfffcfffe)).padding(top = 20.dp, bottom = 20.dp, start = 5.dp, end = 5.dp)
+            .background(color = Color(0xfffcfffe)).padding(top = 10.dp, bottom = 20.dp, start = 5.dp, end = 5.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(13.dp, Alignment.Start),
@@ -112,7 +114,6 @@ fun Appel(navController: NavController) {
                 Text(
                     text = "Partager Position",
                     color = Color(0xff17252a),
-                    lineHeight = 8.em,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,7 +122,6 @@ fun Appel(navController: NavController) {
                 Text(
                     text = "Cyberespace",
                     color = Color(0xff17252a),
-                    lineHeight = 6.51.em,
                     style = TextStyle(
                         fontSize = 20.sp
                     ),
@@ -130,7 +130,7 @@ fun Appel(navController: NavController) {
                 )
             }
         }
-
+        Spacer(modifier = Modifier.padding(top = 12.dp))
         val context = LocalContext.current
         val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
@@ -257,13 +257,26 @@ fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
             onDismissRequest = { dropdownState.onEnabled(false) },
             modifier = Modifier
                 .width(with(density) { dropdownState.size.width.toDp() })
-                .heightIn(max = 200.dp) // enables scrolling if needed
+                .verticalScroll(rememberScrollState())
+                .heightIn(max = 200.dp)
         ) {
-            Column() {
+            Column(
+                modifier = Modifier.fillMaxHeight().background(Color(0xffd1f1e6))
+            ) {
                 dropdownState.items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item.label) },
+                        onClick = {
+                            dropdownState.onEnabled(false)
+                            dropdownState.value = item.label
+                            dropdownState.selectedIndex = dropdownState.items.indexOf(item)
 
+                            makePhoneCall(context, item.number) // <-- make the call when clicked
+                        }
+                    )
                 }
             }
         }
+
     }
 }

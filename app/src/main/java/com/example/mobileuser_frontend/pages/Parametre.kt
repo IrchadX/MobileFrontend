@@ -2,12 +2,12 @@ package com.example.mobileuser_frontend.pages
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -22,11 +22,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.Screens
-import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.module.fontSizeTitle
 
 /*@Preview
@@ -51,10 +51,10 @@ fun Parametre(navController: NavController) {
             }
     ){
         Column(
-            modifier = Modifier
-                .height(screenHeight - 130.dp)
+            modifier = Modifier.fillMaxHeight()
                 .background(color = Color(0xfffcfffe)),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
 
             Text(
@@ -78,15 +78,16 @@ fun Parametre(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(2.dp))
                         .padding(all = 10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3AAFA9))
                 ) {
                     Text(
                         text = "Informations Personnelles",
                         color = Color.White,
+                        textAlign = TextAlign.Center,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = fontSizeSubTitle())
+                        style = TextStyle(fontSize = fontSizeTitle())
                     )
                 }
 
@@ -102,8 +103,9 @@ fun Parametre(navController: NavController) {
                     Text(
                         text = "Préférences de Navigation",
                         color = Color.White,
+                        textAlign = TextAlign.Center,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = fontSizeSubTitle())
+                        style = TextStyle(fontSize = fontSizeTitle())
                     )
                 }
             }

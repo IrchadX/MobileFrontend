@@ -78,7 +78,7 @@ fun CustomDropdown(
         // Custom styled TextField
         OutlinedTextField(
             value = dropdownState.value,
-            onValueChange = {},
+            onValueChange = {},  // No need to change text manually
             readOnly = true,
             label = { Text(label) },
             trailingIcon = {
@@ -103,7 +103,7 @@ fun CustomDropdown(
                     shape = RoundedCornerShape(8.dp)
                 ),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,  // replaces containerColor
+                focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -121,12 +121,15 @@ fun CustomDropdown(
                 .heightIn(max = 200.dp) // enables scrolling if needed
         ) {
             dropdownState.items.forEach { item ->
-                DropdownMenuItem(text = { Text(text = item.label) }, onClick = {
+                DropdownMenuItem(
+                    text = { Text(text = item.label) },
+                    onClick = {
                         dropdownState.onEnabled(false)
-                        dropdownState.value = item.label
+                        dropdownState.value = item.label  // Update the text field with the selected label
                         dropdownState.selectedIndex = items.indexOf(item)
-                        onItemSelected(item)
-                    })
+                        onItemSelected(item)  // Notify item selected
+                    }
+                )
             }
         }
     }

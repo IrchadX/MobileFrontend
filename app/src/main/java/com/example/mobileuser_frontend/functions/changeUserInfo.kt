@@ -1,8 +1,8 @@
 package com.example.mobileuser_frontend.functions
 
-import com.example.mobileuser_frontend.API.ApiResponse
-import com.example.mobileuser_frontend.API.PasswordRequest
-import com.example.mobileuser_frontend.API.ProfilRequest
+import com.example.mobileuser_frontend.data.model.ApiResponse
+import com.example.mobileuser_frontend.data.model.PasswordRequest
+import com.example.mobileuser_frontend.data.model.ProfilRequest
 import com.example.mobileuser_frontend.module.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,6 +20,7 @@ fun splitFullName(fullName: String): Pair<String, String> { // Now both return n
 //Function to change the user data
 fun changeUserData(userId: String, name: String, callback: (String?) -> Unit) {
     val (familyName, firstName) = splitFullName(name)
+    println(familyName+firstName)
     val request = ProfilRequest(userId, firstName, familyName)
     val change = RetrofitClient.instance.changeDataUser(request)
 

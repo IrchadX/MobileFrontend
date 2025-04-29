@@ -1,9 +1,11 @@
 package com.example.mobileuser_frontend
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,19 +40,33 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mobileuser_frontend.module.NavBarItem
+import com.example.mobileuser_frontend.repository.AuthRepository
 import com.example.mobileuser_frontend.ui.theme.MobileUser_FrontendTheme
+import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter",
         "UnusedMaterial3ScaffoldPaddingParameter"
     )
-
+    private lateinit var authViewModel: AuthViewModel
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        AuthViewModel.initialize(applicationContext)
+        val authRepository = AuthRepository(applicationContext)
+        authViewModel = ViewModelProvider(
+            this,
+            AuthViewModelFactory(authRepository)
+        )[AuthViewModel::class.java]
+
         setContent {
 
             MobileUser_FrontendTheme {
@@ -58,6 +74,8 @@ class MainActivity : ComponentActivity() {
                 var dragAmount by remember { mutableStateOf(0f) }
                 val density = LocalDensity.current
                 val sensitivity = with(density) { 70.dp.toPx() } // Convert dp to pixels
+                val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
 
 
                 Scaffold(
@@ -67,22 +85,22 @@ class MainActivity : ComponentActivity() {
                             detectHorizontalDragGestures { _, dragAmount ->
                                 if (dragAmount < -40) {
                                     // Swipe right to go back to Home
-                                    navController.navigate(Screens.Profil.route){popUpTo(0)}
+                                    navController.navigate(Screens.Profil.route) { popUpTo(0) }
                                 }
                                 if (dragAmount > 40) {
                                     // Swipe right to go back to Home
-                                    navController.navigate(Screens.Parametre.route){popUpTo(0)}
+                                    navController.navigate(Screens.Parametre.route) { popUpTo(0) }
                                 }
                             }
-                        }
-                        ,
+                        },
 
                     bottomBar = {
+                        if (currentRoute !in listOf("SignInScreen", "SignUpScreen")) {
                             NavBar(navController)
-
+                        }
                     }
-                ) {
-                    PageNavigation(navController)
+                ) { paddingValues ->
+                    PageNavigation(navController, modifier = Modifier.padding(paddingValues))
                 }
             }
         }
@@ -91,7 +109,16 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
+class AuthViewModelFactory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AuthViewModel(authRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 @Composable
 fun NavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -107,7 +134,7 @@ fun NavBar(navController: NavController) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(100.dp)
                 .background(color = Color(0xffd1f1e6))
                 .padding(horizontal = 40.dp)
         ) {
@@ -132,15 +159,17 @@ fun NavBar(navController: NavController) {
 
         FloatingActionButton(
             onClick = { /* TODO */ },
+            containerColor = Color(0xff3aafa9),
             shape = CircleShape,
-            contentColor = Color(0xff3aafa9),
+            contentColor = Color(0xFF2B7A78),
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
             modifier = Modifier
-                .size(90.dp)
+                .size(110.dp)
                 .padding(bottom = 2.dp)
-                .offset(y = 5.dp)
+                .offset(y = -3.dp)
                 .border(BorderStroke(4.dp, Color.White), CircleShape)
                 .align(Alignment.Center)
+
         ) {
             Image(
                 painter = painterResource(id = R.drawable.microphone),
@@ -152,17 +181,3 @@ fun NavBar(navController: NavController) {
         }
     }
 }
-
-
-
-/*object RetrofitClient {
-    private const val BASE_URL = "http://localhost:3000/"
-
-    val instance: ApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
-    }
-}*/

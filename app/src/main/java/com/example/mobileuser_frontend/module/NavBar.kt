@@ -32,7 +32,7 @@ fun NavBarItem(
         Image(
             painter = painterResource(id = iconId),
             contentDescription = description,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(50.dp)
         )
     }
 }

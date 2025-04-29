@@ -1,98 +1,124 @@
-package com.example.mobileuser_frontend.pages
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.mobileuser_frontend.R
+import com.example.mobileuser_frontend.state.UiState
+import com.example.mobileuser_frontend.viewmodel.PairingViewModel
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
-/*@Preview
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddAidantPreview() {
-    AddAidant()
-}*/
-@Composable
-fun AddAidant(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .background(color = Color(0xff191919))
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.exit),
-            contentDescription = "Icon",
-            colorFilter = ColorFilter.tint(Color.White),
-            modifier = Modifier.padding(12.dp)
-                .requiredSize(size = 40.dp)
-                .clickable { navController.popBackStack() })
+fun AddAidant( navController: NavController,
+               viewModel: PairingViewModel = viewModel()) {
+    val codeState = remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var user_id by remember { mutableStateOf(0) }
 
+    val stateFlow: StateFlow<UiState<String>> = viewModel.state
+    val state = stateFlow.collectAsState().value
+
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        val stringId = viewModel.authRepository.getUserId().firstOrNull()
+        user_id = stringId?.toIntOrNull() ?: 0
+    }
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(1.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.7f)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.qr),
-                contentDescription = "QR",
-                modifier = Modifier
-                    .fillMaxSize(0.6f)
-            )
+            // Instruction text
             Text(
-                text = "Placez le code à l'intérieur du cadre",
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                style = TextStyle(
-                    fontSize = 20.sp),
+                text = "Veuillez entrer le code de l'aidant:",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 16.dp));
+                // TextField for code input
+            TextField(
+                value = codeState.value,
+                onValueChange = { codeState.value = it },
+                label =  { Text("Code aidant") },
                 modifier = Modifier
-                    .fillMaxWidth())
-        }
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxHeight().fillMaxWidth()
-        ) {
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                singleLine = true
+            )
+
+            // Submit button
             Button(
-                onClick = { /* TODO: Handle Microphone Click */ },
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3aafa9)),
-                elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 0.dp),
-                modifier = Modifier .padding(20.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .size(100.dp) // Standardized size
-                    .border(BorderStroke(4.dp, Color.White), CircleShape) // White border
+                onClick = {
+                    if (codeState.value.isNotBlank()) {
+                        viewModel.pair(codeState.value, user_id)
+
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Veuillez entrer un code valide")
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.microphone),
-                    contentDescription = "Microphone",
-                    modifier = Modifier.fillMaxSize()
-                )
+                Text("Envoyer")
             }
+            when (state) {
+                is UiState.Idle -> {
+
+                }
+
+                is UiState.Loading -> {
+                    // Show loading indicator
+                    CircularProgressIndicator()
+                }
+
+                is UiState.Success -> {
+                    // Show success message
+                    val message = (state as UiState.Success<String>).data
+                    Text("Pairing successful: $message")
+                }
+
+                is UiState.Error -> {
+                    // Show error message
+                    val errorMessage = (state as UiState.Error).message
+                    Text("Error: $errorMessage", color = Color.Red)
+                }
         }
     }
 }
+    }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -39,11 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
-import com.example.mobileuser_frontend.API.DeviceData
 import com.example.mobileuser_frontend.R
+import com.example.mobileuser_frontend.data.model.DeviceData
 import com.example.mobileuser_frontend.functions.fetchDeviceInfo
 import com.example.mobileuser_frontend.module.fontSizeSmallText
-import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.module.fontSizeText
 
 
@@ -56,7 +55,6 @@ private fun AppareilPreview() {
 @Composable
 fun Appareil(navController: NavController) {
     val id = "66"
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     var data by remember { mutableStateOf<DeviceData?>(null) }
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -71,18 +69,17 @@ fun Appareil(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(screenHeight-10.dp)
-            .background(color = Color(0xfffcfffe))
+            .fillMaxHeight()
+            .background(color = Color(0xfffcfffe)),
+        verticalArrangement = Arrangement.Center ,
     ) {
         Text(
             text = "Appareil",
             color = Color(0xff17252a),
-            lineHeight = 3.62.em,
             style = TextStyle(
-                fontSize = fontSizeSubTitle(),
+                fontSize = fontSizeText(),
                 fontWeight = FontWeight.Bold,),
-            modifier = Modifier
-                .padding(10.dp),
+
         )
         Column(
 
