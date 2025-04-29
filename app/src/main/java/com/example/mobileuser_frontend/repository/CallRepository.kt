@@ -1,10 +1,6 @@
 package com.example.mobileuser_frontend.repository
 
 
-import com.example.mobileuser_frontend.data.model.ApiResponse
-import com.example.mobileuser_frontend.data.model.DeviceData
-import com.example.mobileuser_frontend.data.model.PasswordRequest
-import com.example.mobileuser_frontend.data.model.ProfilRequest
 import com.example.mobileuser_frontend.module.ListItems
 import com.example.mobileuser_frontend.module.RetrofitClient
 import kotlinx.coroutines.Dispatchers
@@ -14,80 +10,43 @@ class CallRepository {
 
     private val apiService = RetrofitClient.instance
 
-    // Fetch phone number
-    suspend fun fetchPhoneNumber(userId: String): ApiResponse? {
+    // Convert callbacks to suspend functions using coroutines
+    suspend fun getPhoneNumber(userId: String): Result<String> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = apiService.getPhoneNumber(userId).execute()
-                if (response.isSuccessful) response.body() else null
+                if (response.isSuccessful) {
+                    val phone = response.body()?.data
+                    if (phone != null) {
+                        Result.success(phone)
+                    } else {
+                        Result.failure(Exception("Phone number not found"))
+                    }
+                } else {
+                    Result.failure(Exception("Error: ${response.errorBody()?.string()}"))
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
-                null
+                Result.failure(Exception("Network Error: ${e.message}"))
             }
         }
     }
 
-    // Fetch emergency list
-    suspend fun fetchEmergencyList(): List<ListItems>? {
+    suspend fun getEmergencyList(): Result<List<ListItems>> {
         return withContext(Dispatchers.IO) {
             try {
                 val response = apiService.getEmergencyList().execute()
-                if (response.isSuccessful) response.body() else null
+                if (response.isSuccessful) {
+                    val emergencyList = response.body()
+                    if (emergencyList != null) {
+                        Result.success(emergencyList)
+                    } else {
+                        Result.failure(Exception("Emergency list is empty"))
+                    }
+                } else {
+                    Result.failure(Exception("Error: ${response.errorBody()?.string()}"))
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    // Update user profile data
-    suspend fun updateUserProfile(request: ProfilRequest): ApiResponse? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.changeDataUser(request).execute()
-                if (response.isSuccessful) response.body() else null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    // Change user password
-    suspend fun changePassword(request: PasswordRequest): ApiResponse? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.changePasswordUser(request).execute()
-                if (response.isSuccessful) response.body() else null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    // Check user password
-    suspend fun checkPasswordUser(request: PasswordRequest): ApiResponse? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.checkPasswordUser(request).execute()
-                if (response.isSuccessful) response.body() else null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    // Fetch device data
-    suspend fun fetchDeviceData(userId: String): DeviceData? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.getDeviceData(userId).execute()
-                if (response.isSuccessful) response.body() else null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
+                Result.failure(Exception("Network Error: ${e.message}"))
             }
         }
     }

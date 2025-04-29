@@ -7,8 +7,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.mobileuser_frontend.data.model.API.PairResponse
-import com.example.mobileuser_frontend.data.model.PairAidantDto
 import com.example.mobileuser_frontend.data.model.SignInRequest
 import com.example.mobileuser_frontend.data.model.SignInResponse
 import com.example.mobileuser_frontend.data.model.SignUpRequest
@@ -116,21 +114,6 @@ class AuthRepository(private val context: Context) {
             false
         }
     }
-    suspend fun pair( aidant_identifier: String, user_id: Int): PairResponse {
-        try {
-            val dto = PairAidantDto(user_id, aidant_identifier)
-            val response = authApi.pairWithAidant(dto)
-            return response.execute().body() ?: throw Exception("Null response body")
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val errorMessage = try {
-                JSONObject(errorBody ?: "").optString("error", "Pairing failed")
-            } catch (ex: Exception) {
-                "Authentication failed"
-            }
-            throw Exception(errorMessage)
-        } catch (e: Exception) {
-            throw Exception(e.message ?: "Unknown error occurred")
-        }
-    }
+
+
 }

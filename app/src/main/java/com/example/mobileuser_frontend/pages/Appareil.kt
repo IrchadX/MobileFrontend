@@ -288,7 +288,7 @@ fun Appareil(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp) // Increased height for better UI
+                    .height(40.dp)
             ) {
                 Text(
                     text = "Signaler un problème",

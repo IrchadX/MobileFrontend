@@ -22,6 +22,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -102,7 +104,9 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel = androidx
                         }
 
                     },
-                    modifier = Modifier
+                    modifier = Modifier.semantics {
+                        this.contentDescription = "S.O.S"
+                    }
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(4.dp))
@@ -119,7 +123,9 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel = androidx
 
                 Button(
                     onClick = { navController.navigate(Screens.Appel.route) },
-                    modifier = Modifier
+                    modifier = Modifier.semantics {
+                        this.contentDescription = "Assistance"
+                    }
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(4.dp))
@@ -136,7 +142,9 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel = androidx
 
                 Button(
                     onClick = { navController.navigate(Screens.NavigationScreen.route) },
-                    modifier = Modifier
+                    modifier = Modifier.semantics {
+                        this.contentDescription = "Naviguer"
+                    }
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(4.dp))

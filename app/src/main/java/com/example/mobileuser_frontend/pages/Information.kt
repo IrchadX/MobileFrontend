@@ -263,13 +263,13 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                 thickness = 2.dp,
                 modifier = Modifier.fillMaxWidth()
             )
+            var messages = remember { mutableStateOf("") }
             Button(
                 onClick = {
                     // Track completion states
                     var nameChangeCompleted = false
                     var passwordChangeCompleted = false
                     var success = true
-                    val messages = mutableListOf<String>()
                     var icon = R.drawable.iconconfirm
 
                     fun checkAndShowPopup() {
@@ -277,7 +277,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                             (pwd.value.isBlank() || newpwd.value.isBlank() || passwordChangeCompleted)) {
 
                             val finalMessage = when {
-                                messages.isNotEmpty() -> messages.joinToString("\n")
+                                messages.value.isNotEmpty() -> messages.value
                                 else -> "Opération réussie"
                             }
 
@@ -291,12 +291,12 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                     if (!changed && text.value != null) {
                         changeUserData(id, text.value!!) { mess ->
                             nameChangeCompleted = true
-                            if (mess == null || !mess.contains("succès", ignoreCase = true)) {
+                            if (mess == null) {
                                 success = false
                                 icon = R.drawable.iconerror
+                            }else{
+                                messages.value = mess
                             }
-                            mess?.let { messages.add(it) }
-                            checkAndShowPopup()
                         }
                     } else {
                         nameChangeCompleted = true
@@ -308,18 +308,17 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                             if (mes == "true") {
                                 changeUserPassword(id, newpwd.value) { result ->
                                     passwordChangeCompleted = true
-                                    if (result == null || !result.contains("succès", ignoreCase = true)) {
+                                    if (result === null) {
                                         success = false
                                         icon = R.drawable.iconerror
-                                    }
-                                    result?.let { messages.add(it) }
+                                    }else{messages.value = result}
                                     checkAndShowPopup()
                                 }
                             } else {
                                 passwordChangeCompleted = true
                                 success = false
                                 icon = R.drawable.iconerror
-                                mes?.let { messages.add(it) }
+                                mes?.let { messages.value = mes }
                                 checkAndShowPopup()
                             }
                         }

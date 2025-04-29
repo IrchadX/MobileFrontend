@@ -23,39 +23,65 @@ import com.example.mobileuser_frontend.pages.SignUpScreen
 @Composable
 fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifier) {
 
-    NavHost(navController = navController, startDestination = Screens.SignUpScreen.route,  modifier = modifier){
-        composable(route = Screens.MainScreen.route){
-            HomeScreen(navController = navController)
-        }
-        composable(route = Screens.SignInScreen.route){
-            SignInScreen(navController = navController)
-        }
-        composable(route = Screens.SignUpScreen.route){
-            SignUpScreen(navController = navController)
-        }
-        composable(route = Screens.NavigationScreen.route){
-            Navigation(navController = navController)
-        }
-        composable(route = Screens.Profil.route){
-            Profil(navController = navController)
-        }
-        composable(route = Screens.Parametre.route){
-            Parametre(navController = navController)
-        }
-        composable(route = Screens.Information.route){
-            Information()
-        }
-        composable(route = Screens.Appareil.route){
-            Appareil(navController = navController)
-        }
-        composable(route = Screens.AddAidant.route){
-            AddAidant(navController= navController)
-        }
-        composable(route = Screens.Preferences.route){
-            Preferences(navController = navController)
-        }
-        composable(route = Screens.Appel.route){
-            Appel(navController = navController)
+    /*var startDestination by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+
+    // Run this block to check if the user is logged in
+    LaunchedEffect(Unit) {
+        val userId = context.authDataStore.data
+            .map { preferences -> preferences[USER_ID] }
+            .firstOrNull() // Get the user_id from DataStore
+
+        startDestination = if (!userId.isNullOrBlank()) {
+            // User is logged in
+            Screens.MainScreen.route // Set to Home or Main Screen
+        } else {
+            // User is not logged in
+            Screens.SignInScreen.route // Set to SignIn Screen
         }
     }
+
+    // Ensure that startDestination is set before proceeding with the NavHost
+    if (startDestination != null) {*/
+        NavHost(
+            navController = navController,
+            startDestination = Screens.SignInScreen.route, // Default fallback
+            modifier = modifier
+        ) {
+            composable(route = Screens.MainScreen.route) {
+                HomeScreen(navController = navController)
+            }
+            composable(route = Screens.SignInScreen.route) {
+                SignInScreen(navController = navController)
+            }
+            composable(route = Screens.SignUpScreen.route) {
+                SignUpScreen(navController = navController)
+            }
+            composable(route = Screens.NavigationScreen.route) {
+                Navigation(navController = navController)
+            }
+            composable(route = Screens.Profil.route) {
+                Profil(navController = navController)
+            }
+            composable(route = Screens.Parametre.route) {
+                Parametre(navController = navController)
+            }
+            composable(route = Screens.Information.route) {
+                Information()
+            }
+            composable(route = Screens.Appareil.route) {
+                Appareil(navController = navController)
+            }
+            composable(route = Screens.AddAidant.route) {
+                AddAidant(navController = navController)
+            }
+            composable(route = Screens.Preferences.route) {
+                Preferences(navController = navController)
+            }
+            composable(route = Screens.Appel.route) {
+                Appel(navController = navController)
+            }
+        }
+   // }
 }
+

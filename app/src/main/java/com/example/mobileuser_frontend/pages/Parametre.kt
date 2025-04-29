@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.Screens
+import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.module.fontSizeTitle
 
 /*@Preview
@@ -85,9 +86,10 @@ fun Parametre(navController: NavController) {
                     Text(
                         text = "Informations Personnelles",
                         color = Color.White,
+                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = fontSizeTitle())
+                        style = TextStyle(fontSize = fontSizeSubTitle())
                     )
                 }
 
@@ -103,9 +105,10 @@ fun Parametre(navController: NavController) {
                     Text(
                         text = "Préférences de Navigation",
                         color = Color.White,
+                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         lineHeight = 1.5.em,
-                        style = TextStyle(fontSize = fontSizeTitle())
+                        style = TextStyle(fontSize = fontSizeSubTitle())
                     )
                 }
             }

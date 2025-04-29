@@ -136,7 +136,7 @@ fun NavBar(navController: NavController) {
                 .fillMaxWidth()
                 .height(100.dp)
                 .background(color = Color(0xffd1f1e6))
-                .padding(horizontal = 40.dp)
+                .padding(horizontal = 30.dp)
         ) {
             // Home Button
             NavBarItem(
@@ -166,7 +166,7 @@ fun NavBar(navController: NavController) {
             modifier = Modifier
                 .size(110.dp)
                 .padding(bottom = 2.dp)
-                .offset(y = -3.dp)
+                .offset(y = -20.dp)
                 .border(BorderStroke(4.dp, Color.White), CircleShape)
                 .align(Alignment.Center)
 

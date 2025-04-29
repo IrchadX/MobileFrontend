@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.state.UiState
+import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.PairingViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -40,7 +41,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAidant( navController: NavController,
-               viewModel: PairingViewModel = viewModel()) {
+               viewModel: PairingViewModel = viewModel(), authViewModel: AuthViewModel = viewModel()) {
     val codeState = remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -51,7 +52,7 @@ fun AddAidant( navController: NavController,
 
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        val stringId = viewModel.authRepository.getUserId().firstOrNull()
+        val stringId = authViewModel.authRepository.getUserId().firstOrNull()
         user_id = stringId?.toIntOrNull() ?: 0
     }
     Scaffold(

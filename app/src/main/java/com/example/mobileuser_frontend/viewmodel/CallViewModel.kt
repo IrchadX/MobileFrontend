@@ -2,67 +2,79 @@ package com.example.mobileuser_frontend.viewmodel
 
 
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileuser_frontend.data.model.ApiResponse
-import com.example.mobileuser_frontend.data.model.DeviceData
-import com.example.mobileuser_frontend.data.model.PasswordRequest
-import com.example.mobileuser_frontend.data.model.ProfilRequest
-import com.example.mobileuser_frontend.module.ListItems
 import com.example.mobileuser_frontend.repository.CallRepository
+import com.example.mobileuser_frontend.state.EmergencyUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CallViewModel(private val repository: CallRepository) : ViewModel() {
+class CallViewModel(
+    private val repository: CallRepository = CallRepository()
+) : ViewModel() {
 
-    private val _phoneNumberState = MutableStateFlow<ApiResponse?>(null)
-    val phoneNumberState: StateFlow<ApiResponse?> get() = _phoneNumberState
+    // UI State
+    private val _uiState = MutableStateFlow<EmergencyUiState>(EmergencyUiState.Idle)
+    val uiState: StateFlow<EmergencyUiState> = _uiState.asStateFlow()
 
-    private val _emergencyListState = MutableStateFlow<List<ListItems>?>(null)
-    val emergencyListState: StateFlow<List<ListItems>?> get() = _emergencyListState
+    private val _uiEmergencyState = MutableStateFlow<EmergencyUiState>(EmergencyUiState.Idle)
+    val uiEmergencyState: StateFlow<EmergencyUiState> = _uiEmergencyState.asStateFlow()
 
-    private val _profileUpdateState = MutableStateFlow<ApiResponse?>(null)
-    val profileUpdateState: StateFlow<ApiResponse?> get() = _profileUpdateState
-
-    private val _passwordChangeState = MutableStateFlow<ApiResponse?>(null)
-    val passwordChangeState: StateFlow<ApiResponse?> get() = _passwordChangeState
-
-    private val _deviceDataState = MutableStateFlow<DeviceData?>(null)
-    val deviceDataState: StateFlow<DeviceData?> get() = _deviceDataState
-
-    // Fetch phone number
+    // Function to fetch phone number
     fun fetchPhoneNumber(userId: String) {
         viewModelScope.launch {
-            _phoneNumberState.value = repository.fetchPhoneNumber(userId)
+            _uiState.value = EmergencyUiState.Loading
+            repository.getPhoneNumber(userId).fold(
+                onSuccess = { number ->
+                    _uiState.value = EmergencyUiState.PhoneNumberLoaded(number)
+                },
+                onFailure = { exception ->
+                    _uiState.value = EmergencyUiState.Error(exception.message ?: "Unknown error")
+                }
+            )
         }
     }
 
-    // Fetch emergency list
+    // Function to fetch emergency list
     fun fetchEmergencyList() {
         viewModelScope.launch {
-            _emergencyListState.value = repository.fetchEmergencyList()
+            _uiEmergencyState.value = EmergencyUiState.Loading
+            repository.getEmergencyList().fold(
+                onSuccess = { list ->
+                    _uiEmergencyState.value = EmergencyUiState.EmergencyListLoaded(list)
+                },
+                onFailure = { exception ->
+                    _uiEmergencyState.value = EmergencyUiState.Error(exception.message ?: "Unknown error")
+                }
+            )
         }
     }
 
-    // Update user profile
-    fun updateUserProfile(request: ProfilRequest) {
-        viewModelScope.launch {
-            _profileUpdateState.value = repository.updateUserProfile(request)
+    // Function to make phone call
+    fun makePhoneCall(context: Context, phoneNumber: String) {
+        val callIntent = Intent(Intent.ACTION_CALL).apply {
+            data = Uri.parse("tel:$phoneNumber")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-    }
 
-    // Change user password
-    fun changePassword(request: PasswordRequest) {
-        viewModelScope.launch {
-            _passwordChangeState.value = repository.changePassword(request)
-        }
-    }
-
-    // Fetch device data
-    fun fetchDeviceData(userId: String) {
-        viewModelScope.launch {
-            _deviceDataState.value = repository.fetchDeviceData(userId)
+        // Check if permission is granted
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CALL_PHONE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            context.startActivity(callIntent)
+        } else {
+            Toast.makeText(context, "CALL_PHONE permission required", Toast.LENGTH_SHORT).show()
         }
     }
 }

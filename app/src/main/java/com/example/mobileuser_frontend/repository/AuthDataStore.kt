@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 
@@ -25,7 +26,14 @@ class AuthDataStore(private val context: Context) {
             preferences[AUTH_TOKEN] = token
         }
     }
-
+    fun getUserId(): Flow<String?> {
+        return context.authDataStore.data
+            .map { preferences -> preferences[USER_ID] }
+    }
+    suspend fun isUserLoggedIn(): Boolean {
+        val userId = getUserId().firstOrNull()
+        return !userId.isNullOrBlank()
+    }
 
 
 }

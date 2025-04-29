@@ -24,7 +24,7 @@ interface ApiService {
     fun getEmergencyList(): Call<List<ListItems>>
     @GET("api/getDataProfil/{id}")
     fun getData(@Path("id") userId: String) : Call<ProfilData>
-    @POST("api/changeDataProfil") // Accepts 'id', 'first', and 'last' as parameters
+    @POST("api/changeDataProfil")
     fun changeDataUser(@Body request: ProfilRequest) : Call<ApiResponse>
     @POST("api/changePassword")
     fun changePasswordUser(@Body passwordRequest: PasswordRequest) : Call<ApiResponse>

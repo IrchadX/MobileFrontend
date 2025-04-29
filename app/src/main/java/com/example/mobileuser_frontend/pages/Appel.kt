@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -27,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,33 +59,69 @@ import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.R
-import com.example.mobileuser_frontend.functions.fetchPhoneNumber
 import com.example.mobileuser_frontend.functions.makePhoneCall
 import com.example.mobileuser_frontend.module.DropDown
-import com.example.mobileuser_frontend.viewmodel.EmergencyViewModel
+import com.example.mobileuser_frontend.module.ListItems
+import com.example.mobileuser_frontend.state.EmergencyUiState
+import com.example.mobileuser_frontend.viewmodel.CallViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.flow.StateFlow
 
-/*@Preview
-@Composable
-private fun AppelPreview() {
-    Appel()
-}*/
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun Appel(navController: NavController) {
+fun Appel(navController: NavController, viewModel: CallViewModel = viewModel()) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val scrollvertical = rememberScrollState()
+    val context = LocalContext.current
+    val stateFlow: StateFlow<EmergencyUiState> = viewModel.uiState
+    val uistate = stateFlow.collectAsState().value
+    val emergencyStateFlow: StateFlow<EmergencyUiState> = viewModel.uiEmergencyState
+    val uiEmergencyState =emergencyStateFlow.collectAsState().value
+    when (uistate) {
+        is EmergencyUiState.Loading -> {
+            // Show loading indicator (no toast needed)
+            CircularProgressIndicator()
+        }
+
+        is EmergencyUiState.PhoneNumberLoaded -> {
+            // When phone number is loaded, make the call
+            val phoneNumber = uistate.phoneNumber
+            LaunchedEffect(key1 = phoneNumber) {
+                viewModel.makePhoneCall(context, phoneNumber)
+                Toast.makeText(
+                    context,
+                    "Calling $phoneNumber...",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        is EmergencyUiState.Error -> {
+            LaunchedEffect(key1 = uistate) {
+                Toast.makeText(
+                    context,
+                    "Error: ${uistate.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        else -> {
+            // Idle state
+        }
+    }
+
     Column(
 
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
-            .background(color = Color(0xfffcfffe)).padding(top = 10.dp, bottom = 20.dp, start = 5.dp, end = 5.dp)
+            .verticalScroll(scrollvertical)
+            .background(color = Color(0xfffcfffe))
+            .padding(top = 10.dp, bottom = 20.dp, start = 5.dp, end = 5.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(13.dp, Alignment.Start),
@@ -117,7 +155,7 @@ fun Appel(navController: NavController) {
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {  }
+                        .clickable { }
                 )
                 Text(
                     text = "Cyberespace",
@@ -135,35 +173,14 @@ fun Appel(navController: NavController) {
         val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
         Button(
-                onClick = {
-                    when {
-                        callPermissionState.status.isGranted -> {
-                            // Permission already granted - make the call
-                            fetchPhoneNumber("66") { phone ->
-                                if (phone != null) {
-                                    makePhoneCall(context,phone)
-                                } else {
-                                    Toast.makeText(context, "Error: Try again Please", Toast.LENGTH_LONG).show()
-                                }
-                            }
+            onClick = {viewModel.fetchPhoneNumber("66")
+            },
 
-                        }
-                        callPermissionState.status.shouldShowRationale -> {
-                            Toast.makeText(
-                                context,
-                                "Phone call permission is required to make calls",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        else -> {
-                            // Request permission
-                            callPermissionState.launchPermissionRequest()
-                        }
-                    }
-                },
+
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.3f)
+                .height(20.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .padding(all = 5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252a))
@@ -186,97 +203,125 @@ fun Appel(navController: NavController) {
             modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
         )
 
+        //Case of the Emergency List
+        when (val state = uiEmergencyState) {
+            is EmergencyUiState.Loading -> {
+                // Show loading indicator (no toast needed)
+                CircularProgressIndicator()
+                viewModel.fetchEmergencyList()
+            }
 
+            is EmergencyUiState.EmergencyListLoaded -> {
+                EmergencyDropdown(state.list)
+            }
 
-        EmergencyDropdown()
-
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EmergencyDropdown(viewModel: EmergencyViewModel = viewModel()) {
-    val dropdownState = remember { DropDown() }
-    val items by viewModel.dropdownItems
-
-    val context = LocalContext.current
-    val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
-
-
-    dropdownState.value = "Appel d'urgence"
-    // Update items when they are ready
-    LaunchedEffect(items) {
-        dropdownState.items = items
-    }
-    val density = LocalDensity.current
-    val backgroundColor = Color(0xFF2B7A78).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
-    val borderColor = Color(0xFF3AAFA9) // Your teal border color
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        // Custom styled TextField
-        OutlinedTextField(
-            value = dropdownState.value,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = {
-                Icon(
-                    painter = painterResource(id = dropdownState.icon),
-                    contentDescription = "Menu déroulant",
-                    modifier = Modifier.clickable {
-                        dropdownState.onEnabled(!dropdownState.enabled)
-                    },
-                    tint = Color(0xFF17252A)
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    dropdownState.onSize(coordinates.size.toSize())
+            is EmergencyUiState.Error -> {
+                LaunchedEffect(key1 = uiEmergencyState) {
+                    Toast.makeText(
+                        context,
+                        "Error: ${state.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-                .clip(RoundedCornerShape(8.dp))
-                .background(backgroundColor)
-                .border(
-                    BorderStroke(1.dp, borderColor),
-                    shape = RoundedCornerShape(8.dp)
-                ),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,  // replaces containerColor
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color(0xFF17252A)
-            ),
-            textStyle = TextStyle(
-                fontSize = 16.sp
-            )
-        )
+            }
 
-        // Dropdown Menu
-        DropdownMenu(
-            expanded = dropdownState.enabled,
-            onDismissRequest = { dropdownState.onEnabled(false) },
-            modifier = Modifier
-                .width(with(density) { dropdownState.size.width.toDp() })
-                .verticalScroll(rememberScrollState())
-                .heightIn(max = 200.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxHeight().background(Color(0xffd1f1e6))
-            ) {
-                dropdownState.items.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item.label) },
-                        onClick = {
-                            dropdownState.onEnabled(false)
-                            dropdownState.value = item.label
-                            dropdownState.selectedIndex = dropdownState.items.indexOf(item)
-
-                            makePhoneCall(context, item.number) // <-- make the call when clicked
-                        }
-                    )
-                }
+            else -> {
+                // Idle state
             }
         }
 
+
+        }
     }
-}
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun EmergencyDropdown( items: List<ListItems>){
+        val dropdownState = remember { DropDown() }
+
+
+        val context = LocalContext.current
+        val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
+
+
+        dropdownState.value = "Appel d'urgence"
+        // Update items when they are ready
+        LaunchedEffect(items) {
+            dropdownState.items = items
+        }
+        val density = LocalDensity.current
+        val backgroundColor = Color(0xFF2B7A78).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
+        val borderColor = Color(0xFF3AAFA9) // Your teal border color
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Custom styled TextField
+            OutlinedTextField(
+                value = dropdownState.value,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    Icon(
+                        painter = painterResource(id = dropdownState.icon),
+                        contentDescription = "Menu déroulant",
+                        modifier = Modifier.clickable {
+                            dropdownState.onEnabled(!dropdownState.enabled)
+                        },
+                        tint = Color(0xFF17252A)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        dropdownState.onSize(coordinates.size.toSize())
+                    }
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(backgroundColor)
+                    .border(
+                        BorderStroke(1.dp, borderColor),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,  // replaces containerColor
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = Color(0xFF17252A)
+                ),
+                textStyle = TextStyle(
+                    fontSize = 16.sp
+                )
+            )
+
+            // Dropdown Menu
+            DropdownMenu(
+                expanded = dropdownState.enabled,
+                onDismissRequest = { dropdownState.onEnabled(false) },
+                modifier = Modifier
+                    .width(with(density) { dropdownState.size.width.toDp() })
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(max = 200.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxHeight().background(Color(0xffd1f1e6))
+                ) {
+                    dropdownState.items.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(text = item.label) },
+                            onClick = {
+                                dropdownState.onEnabled(false)
+                                dropdownState.value = item.label
+                                dropdownState.selectedIndex = dropdownState.items.indexOf(item)
+
+                                makePhoneCall(
+                                    context,
+                                    item.number
+                                ) // <-- make the call when clicked
+                            }
+                        )
+                    }
+                }
+            }
+
+        }
+    }
+
