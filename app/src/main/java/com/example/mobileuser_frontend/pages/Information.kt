@@ -282,7 +282,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                             }
 
                             dialog.text = finalMessage
-                            dialog.icon = icon
+                            dialog.icon = if (!success) R.drawable.iconconfirm else R.drawable.iconerror
                             dialog.showDialog = true
                         }
                     }
@@ -291,7 +291,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                     if (!changed && text.value != null) {
                         changeUserData(id, text.value!!) { mess ->
                             nameChangeCompleted = true
-                            if (mess == null) {
+                            if (mess != "Opération Réussie") {
                                 success = false
                                 icon = R.drawable.iconerror
                             }else{
@@ -308,7 +308,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                             if (mes == "true") {
                                 changeUserPassword(id, newpwd.value) { result ->
                                     passwordChangeCompleted = true
-                                    if (result === null) {
+                                    if (result != "Opération Réussie") {
                                         success = false
                                         icon = R.drawable.iconerror
                                     }else{messages.value = result}
@@ -330,7 +330,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
 
                         modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(70.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
                 elevation = ButtonDefaults.elevatedButtonElevation(5.dp)

@@ -40,7 +40,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,15 +66,17 @@ import com.example.mobileuser_frontend.functions.makePhoneCall
 import com.example.mobileuser_frontend.module.DropDown
 import com.example.mobileuser_frontend.module.ListItems
 import com.example.mobileuser_frontend.state.EmergencyUiState
+import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.CallViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun Appel(navController: NavController, viewModel: CallViewModel = viewModel()) {
+fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), authviewModel: AuthViewModel= viewModel()) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val scrollvertical = rememberScrollState()
@@ -80,6 +85,18 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel()) 
     val uistate = stateFlow.collectAsState().value
     val emergencyStateFlow: StateFlow<EmergencyUiState> = viewModel.uiEmergencyState
     val uiEmergencyState =emergencyStateFlow.collectAsState().value
+
+    var id by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        id = authviewModel.authRepository.getUserId().firstOrNull() ?: ""
+
+    }
+
+
+    LaunchedEffect(key1 = true) {
+        viewModel.fetchEmergencyList()
+    }
     when (uistate) {
         is EmergencyUiState.Loading -> {
             // Show loading indicator (no toast needed)
@@ -173,14 +190,14 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel()) 
         val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
         Button(
-            onClick = {viewModel.fetchPhoneNumber("66")
+            onClick = {viewModel.fetchPhoneNumber(id)
             },
 
 
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.3f)
-                .height(20.dp)
+                .height(80.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .padding(all = 5.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252a))
@@ -208,7 +225,6 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel()) 
             is EmergencyUiState.Loading -> {
                 // Show loading indicator (no toast needed)
                 CircularProgressIndicator()
-                viewModel.fetchEmergencyList()
             }
 
             is EmergencyUiState.EmergencyListLoaded -> {

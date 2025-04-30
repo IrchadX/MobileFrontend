@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +72,7 @@ fun Appareil(navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
             .background(color = Color(0xfffcfffe)),
         verticalArrangement = Arrangement.Center ,
     ) {
@@ -288,7 +291,7 @@ fun Appareil(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .height(90.dp)
             ) {
                 Text(
                     text = "Signaler un problème",

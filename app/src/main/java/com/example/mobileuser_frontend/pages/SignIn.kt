@@ -267,7 +267,7 @@ fun SignInScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 // Sign in button
                 Button(
