@@ -328,7 +328,7 @@ fun SignUpScreen(
 
                 // Sign up button
                 Button(
-                    onClick = { viewModel.signUp(firstName, familyName, email, password, confirmPassword) },
+                    onClick = { viewModel.signUp(firstName, familyName, email, password, confirmPassword)},
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

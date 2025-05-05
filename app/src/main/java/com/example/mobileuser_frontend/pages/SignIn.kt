@@ -249,23 +249,7 @@ fun SignInScreen(
                     )
                 }
 
-                // Forgot password
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Text(
-                        text = "Forgot password ?",
-                        fontSize = fontSizeSmallText(),
-                        color = Color.DarkGray,
-                        modifier = Modifier.clickable {
-                            // Handle forgot password
-                            navController.navigate("forgot_password")
-                        }
-                    )
-                }
+
 
                 Spacer(modifier = Modifier.height(15.dp))
 
@@ -345,6 +329,7 @@ fun SignInScreen(
                 }
             }
             is AuthUIState.Error -> {
+                val message = (authState as AuthUIState.Error).message
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -352,7 +337,7 @@ fun SignInScreen(
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-                        text = (authState as AuthUIState.Error).message,
+                        text = message,
                         color = Color.Red,
                         textAlign = TextAlign.Center,
                         modifier = Modifier

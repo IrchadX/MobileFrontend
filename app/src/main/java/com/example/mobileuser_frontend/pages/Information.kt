@@ -58,12 +58,13 @@ private fun InformationPreview() {
 fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    var changed = false
+    var changed = remember { mutableStateOf(false) }
     val context = LocalContext.current
     var text = remember { mutableStateOf<String?>(null) }
     val pwd = remember { mutableStateOf<String>("") }
     var newpwd = remember { mutableStateOf<String>("") }
     val dialog = remember { Dialog() } //For pop ups
+    var success = remember { mutableStateOf(true) }
 
     var id by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
@@ -134,7 +135,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                         value = text?.value ?: "",
                         onValueChange = { newText ->
                             text.value = newText
-                            changed = true
+                            changed.value = true
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -269,64 +270,72 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                     // Track completion states
                     var nameChangeCompleted = false
                     var passwordChangeCompleted = false
-                    var success = true
+
                     var icon = R.drawable.iconconfirm
 
+                    // Function to check conditions and show the popup
                     fun checkAndShowPopup() {
-                        if ((!changed || nameChangeCompleted) &&
-                            (pwd.value.isBlank() || newpwd.value.isBlank() || passwordChangeCompleted)) {
-
+                        if (nameChangeCompleted && passwordChangeCompleted) {
                             val finalMessage = when {
                                 messages.value.isNotEmpty() -> messages.value
                                 else -> "Opération réussie"
                             }
 
                             dialog.text = finalMessage
-                            dialog.icon = if (!success) R.drawable.iconconfirm else R.drawable.iconerror
+                            dialog.icon = if (success.value) R.drawable.iconconfirm else R.drawable.iconerror
                             dialog.showDialog = true
                         }
                     }
 
                     // Handle name change if needed
-                    if (!changed && text.value != null) {
+                    if (changed.value && text.value != null) {
                         changeUserData(id, text.value!!) { mess ->
                             nameChangeCompleted = true
                             if (mess != "Opération Réussie") {
-                                success = false
-                                icon = R.drawable.iconerror
-                            }else{
+                                success.value = false
+                                icon = R.drawable.iconconfirm
+                                messages.value = mess.toString()
+                            } else {
                                 messages.value = mess
                             }
+                            checkAndShowPopup() // Check and show popup after name change completes
                         }
                     } else {
-                        nameChangeCompleted = true
+                        nameChangeCompleted = true // No name change needed, mark as completed
                     }
 
                     // Handle password change if needed
                     if (pwd.value.isNotBlank() && newpwd.value.isNotBlank()) {
                         checkUserPassword(id, pwd.value) { mes ->
                             if (mes == "true") {
+                                // Current password is valid, proceed to change it
                                 changeUserPassword(id, newpwd.value) { result ->
                                     passwordChangeCompleted = true
                                     if (result != "Opération Réussie") {
-                                        success = false
+                                        success.value = false
                                         icon = R.drawable.iconerror
-                                    }else{messages.value = result}
-                                    checkAndShowPopup()
+                                        messages.value = result ?: "Une erreur inconnue est survenue"
+                                    } else {
+                                        messages.value = result
+                                    }
+                                    checkAndShowPopup() // Check and show popup after password change completes
                                 }
                             } else {
+                                // Invalid current password
                                 passwordChangeCompleted = true
-                                success = false
+                                success.value = false
                                 icon = R.drawable.iconerror
-                                mes?.let { messages.value = mes }
-                                checkAndShowPopup()
+                                mes?.let { messages.value = it }
+                                checkAndShowPopup() // Check and show popup after password validation fails
                             }
                         }
                     } else {
-                        passwordChangeCompleted = true
+                        passwordChangeCompleted = true // No password change needed, mark as completed
                     }
-                },
 
+                    // Final check to ensure popup is shown if no changes are needed
+                    checkAndShowPopup()
+                },
 
                         modifier = Modifier
                     .fillMaxWidth()

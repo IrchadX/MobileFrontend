@@ -109,6 +109,11 @@ class AuthViewModel(
                     )
 
                     val userId = authRepository.signUp(request)
+                    authRepository.saveAuthInfo(
+                        userId = userId.toString(),
+                        token = "",
+                        email = email
+                    )
 
                     _state.value = AuthUIState.SignUpSuccess(userId)
                 }
