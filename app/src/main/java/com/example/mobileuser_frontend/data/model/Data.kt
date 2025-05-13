@@ -6,7 +6,7 @@ data class ApiResponse(val data: String)
 data class ProfilData(val fullName: String)
 data class ProfilRequest(val id : String , val firstName: String, val lastName: String)
 data class PasswordRequest(val id : String , val pwd: String)
-data class DeviceData(val type: String="", val state :  String="Deconnected", val mac_address: String = "")
+data class DeviceData(val type: String="", val state :  String="Deconnected", val mac_address: String = "", val battery_capacity: Int)
 
 data class SignInRequest(
     val email: String,

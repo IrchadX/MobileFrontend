@@ -46,7 +46,9 @@ import com.example.mobileuser_frontend.data.model.DeviceData
 import com.example.mobileuser_frontend.functions.fetchDeviceInfo
 import com.example.mobileuser_frontend.module.fontSizeSmallText
 import com.example.mobileuser_frontend.module.fontSizeText
+import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.LocationViewModel
+import kotlinx.coroutines.flow.firstOrNull
 
 
 /*@Preview
@@ -56,18 +58,26 @@ private fun AppareilPreview() {
 }*/
 
 @Composable
-fun Appareil(navController: NavController) {
-    val id = "66"
+fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+
     var data by remember { mutableStateOf<DeviceData?>(null) }
 
     val context = LocalContext.current
+
+    var id by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(Unit) {
+        id = viewModel.authRepository.getUserId().firstOrNull() ?: ""
+        // now you can use id
+    }
 
     val viewModelLocation = LocationViewModel(context)
     LaunchedEffect(Unit) {
         fetchDeviceInfo(id) { info ->
             data = info
             if (data == null){
-                Toast.makeText(context, "Server Error" , Toast.LENGTH_LONG).show()}
+                Toast.makeText(context, "User n'a pas d'appareil" , Toast.LENGTH_LONG).show()}
         }
 
     }
@@ -103,13 +113,15 @@ fun Appareil(navController: NavController) {
                 style = MaterialTheme.typography.headlineSmall)
             Box(
                 modifier = Modifier
-                    .requiredWidth(width = 280.dp)
+                    .requiredWidth( width = (data?.battery_capacity?.let { capacity ->
+                        300.dp * (capacity.coerceIn(0, 100) / 100f)
+                    } ?: 0.dp))
                     .requiredHeight(height = 40.dp)
                     .clip(shape = RoundedCornerShape(6.dp))
                     .background(color = Color(0xff3aafa9))
             ) {
                 Text(
-                    text = "75 %",
+                    text = data?.battery_capacity?.toString()?.plus(" %") ?: "Pas de batterie",
                     color = Color.White,
                     style = TextStyle(
                         fontSize = fontSizeText(),
