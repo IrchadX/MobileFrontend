@@ -49,6 +49,7 @@ android {
 dependencies {
 
     // Networking
+    implementation "org.java-websocket:Java-WebSocket:1.5.3"
     implementation("com.squareup.retrofit2:retrofit:2.11.0")  // Updated from 2.9.0
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 

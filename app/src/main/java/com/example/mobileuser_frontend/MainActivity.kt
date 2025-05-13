@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,8 +48,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mobileuser_frontend.module.NavBarItem
 import com.example.mobileuser_frontend.repository.AuthRepository
+import com.example.mobileuser_frontend.service.AudioService
 import com.example.mobileuser_frontend.ui.theme.MobileUser_FrontendTheme
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -56,10 +60,13 @@ class MainActivity : ComponentActivity() {
         "UnusedMaterial3ScaffoldPaddingParameter"
     )
     private lateinit var authViewModel: AuthViewModel
+    private lateinit var audioService: AudioService
+
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize AuthViewModel
         AuthViewModel.initialize(applicationContext)
         val authRepository = AuthRepository(applicationContext)
         authViewModel = ViewModelProvider(
@@ -67,16 +74,21 @@ class MainActivity : ComponentActivity() {
             AuthViewModelFactory(authRepository)
         )[AuthViewModel::class.java]
 
-        setContent {
+        // Initialize AudioService
+        audioService = AudioService(this)
 
+        // Check for audio recording permission
+        audioService.checkAndRequestPermissions()
+
+        setContent {
             MobileUser_FrontendTheme {
                 val navController = rememberNavController()
+                val coroutineScope = rememberCoroutineScope()
+                var isRecordingState by remember { mutableStateOf(false) }
                 var dragAmount by remember { mutableStateOf(0f) }
                 val density = LocalDensity.current
                 val sensitivity = with(density) { 70.dp.toPx() } // Convert dp to pixels
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-
-
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
@@ -96,7 +108,20 @@ class MainActivity : ComponentActivity() {
 
                     bottomBar = {
                         if (currentRoute !in listOf("SignInScreen", "SignUpScreen")) {
-                            NavBar(navController)
+                            NavBar(
+                                navController = navController,
+                                isRecording = isRecordingState,
+                                onRecordingStateChange = { newState ->
+                                    isRecordingState = newState
+                                    if (isRecordingState) {
+                                        coroutineScope.launch(Dispatchers.IO) {
+                                            audioService.startRecording()
+                                        }
+                                    } else {
+                                        audioService.stopRecording()
+                                    }
+                                }
+                            )
                         }
                     }
                 ) { paddingValues ->
@@ -106,8 +131,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        audioService.cleanup()
+    }
 }
-
 
 class AuthViewModelFactory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -119,8 +147,13 @@ class AuthViewModelFactory(private val authRepository: AuthRepository) : ViewMod
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
 @Composable
-fun NavBar(navController: NavController) {
+fun NavBar(
+    navController: NavController,
+    isRecording: Boolean = false,
+    onRecordingStateChange: (Boolean) -> Unit = {}
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -158,8 +191,8 @@ fun NavBar(navController: NavController) {
         }
 
         FloatingActionButton(
-            onClick = { /* TODO */ },
-            containerColor = Color(0xff3aafa9),
+            onClick = { onRecordingStateChange(!isRecording) },
+            containerColor = if (isRecording) Color.Red else Color(0xff3aafa9),
             shape = CircleShape,
             contentColor = Color(0xFF2B7A78),
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
