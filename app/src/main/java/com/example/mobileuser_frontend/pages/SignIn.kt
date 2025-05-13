@@ -1,6 +1,7 @@
 package com.example.mobileuser_frontend.pages
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -330,26 +332,13 @@ fun SignInScreen(
             }
             is AuthUIState.Error -> {
                 val message = (authState as AuthUIState.Error).message
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.BottomCenter)
-                ) {
-                    Text(
-                        text = message,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = Color.Red.copy(alpha = 0.1f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(16.dp)
-                    )
+                val context = LocalContext.current
+
+                LaunchedEffect(authState) {
+                    Toast.makeText(context, "Erreur: Veuillez réessayer", Toast.LENGTH_LONG).show()
                 }
             }
+
             else -> {}
         }
     }

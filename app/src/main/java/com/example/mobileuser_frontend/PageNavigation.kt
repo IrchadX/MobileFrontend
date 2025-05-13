@@ -4,6 +4,11 @@ import AddAidant
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,11 +23,21 @@ import com.example.mobileuser_frontend.pages.Preferences
 import com.example.mobileuser_frontend.pages.Profil
 import com.example.mobileuser_frontend.pages.SignInScreen
 import com.example.mobileuser_frontend.pages.SignUpScreen
+import com.example.mobileuser_frontend.repository.AuthRepository
+import kotlinx.coroutines.flow.collectLatest
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifier) {
+fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifier, authRepository: AuthRepository) {
 
+    var isAuthenticated by remember { mutableStateOf(false) }
+
+    // Check authentication state
+    LaunchedEffect(Unit) {
+        authRepository.getUserId().collectLatest { userId ->
+            isAuthenticated = !userId.isNullOrEmpty()
+        }
+    }
     /*var startDestination by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
@@ -49,7 +64,13 @@ fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifi
             modifier = modifier
         ) {
             composable(route = Screens.MainScreen.route) {
-                HomeScreen(navController = navController)
+                if (isAuthenticated) {
+                    HomeScreen(navController = navController)
+                } else {
+                    navController.navigate(Screens.SignInScreen.route) {
+                        popUpTo(Screens.MainScreen.route) { inclusive = true }
+                    }
+                }
             }
             composable(route = Screens.SignInScreen.route) {
                 SignInScreen(navController = navController)

@@ -111,7 +111,7 @@ fun AddAidant( navController: NavController,
                 is UiState.Success -> {
                     // Show success message
                     val message = (state as UiState.Success<String>).data
-                    Text("Pairing successful: $message")
+                    Text("$message")
                 }
 
                 is UiState.Error -> {

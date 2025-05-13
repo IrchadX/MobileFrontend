@@ -3,6 +3,7 @@ package com.example.mobileuser_frontend.data.model.API
 
 import com.example.mobileuser_frontend.data.model.ApiResponse
 import com.example.mobileuser_frontend.data.model.DeviceData
+import com.example.mobileuser_frontend.data.model.LocationRequest
 import com.example.mobileuser_frontend.data.model.PasswordRequest
 import com.example.mobileuser_frontend.data.model.ProfilData
 import com.example.mobileuser_frontend.data.model.ProfilRequest
@@ -33,6 +34,12 @@ interface ApiService {
     @GET("api/getDeviceInfo/{id}")
     fun getDeviceData(@Path("id") userId: String) : Call<DeviceData>
 
+    //Localisation
+    @POST("location/update")
+    suspend fun updateLocation(@Body body: LocationRequest): ApiResponse
+
+    @POST("location/share")
+    suspend fun shareLocation(@Body body: LocationRequest): ApiResponse
 
 
 }

@@ -85,3 +85,13 @@ data class PairAidantDto(
     val user_id: Int,
     val aidant_identifier: String,
 )
+
+data class UserLocation(
+    val latitude: Double,
+    val longitude: Double
+)
+data class LocationRequest(
+    val userId: String,
+    val latitude: String,
+    val longitude: String
+)

@@ -6,6 +6,8 @@ package com.example.mobileuser_frontend.pages
 
 import android.Manifest
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -69,6 +71,7 @@ import com.example.mobileuser_frontend.state.EmergencyUiState
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.CallViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -87,6 +90,19 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
     val uiEmergencyState =emergencyStateFlow.collectAsState().value
 
     var id by remember { mutableStateOf("") }
+    // Permission state for CALL_PHONE
+    val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(context, "Permission granted. You can now make calls.", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Permission denied. Cannot make calls.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         id = authviewModel.authRepository.getUserId().firstOrNull() ?: ""
@@ -103,16 +119,25 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
             CircularProgressIndicator()
         }
 
+
         is EmergencyUiState.PhoneNumberLoaded -> {
-            // When phone number is loaded, make the call
             val phoneNumber = uistate.phoneNumber
             LaunchedEffect(key1 = phoneNumber) {
-                viewModel.makePhoneCall(context, phoneNumber)
-                Toast.makeText(
-                    context,
-                    "Calling $phoneNumber...",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (callPermissionState.status.isGranted) {
+                    viewModel.makePhoneCall(context, phoneNumber,requestPermissionLauncher)
+                    Toast.makeText(
+                        context,
+                        "Calling $phoneNumber...",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    callPermissionState.launchPermissionRequest()
+                    Toast.makeText(
+                        context,
+                        "Permission required to make a call.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 
@@ -328,10 +353,21 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                                 dropdownState.value = item.label
                                 dropdownState.selectedIndex = dropdownState.items.indexOf(item)
 
-                                makePhoneCall(
-                                    context,
-                                    item.number
-                                ) // <-- make the call when clicked
+                                // Check permission before making the call
+                                if (callPermissionState.status.isGranted) {
+                                    makePhoneCall(
+                                        context,
+                                        item.number
+                                    ) // Make the call directly if permission is granted
+                                } else {
+                                    // Request permission if not granted
+                                    callPermissionState.launchPermissionRequest()
+                                    Toast.makeText(
+                                        context,
+                                        "Permission required to make a call.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         )
                     }

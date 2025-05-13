@@ -46,6 +46,7 @@ import com.example.mobileuser_frontend.data.model.DeviceData
 import com.example.mobileuser_frontend.functions.fetchDeviceInfo
 import com.example.mobileuser_frontend.module.fontSizeSmallText
 import com.example.mobileuser_frontend.module.fontSizeText
+import com.example.mobileuser_frontend.viewmodel.LocationViewModel
 
 
 /*@Preview
@@ -58,7 +59,10 @@ private fun AppareilPreview() {
 fun Appareil(navController: NavController) {
     val id = "66"
     var data by remember { mutableStateOf<DeviceData?>(null) }
+
     val context = LocalContext.current
+
+    val viewModelLocation = LocationViewModel(context)
     LaunchedEffect(Unit) {
         fetchDeviceInfo(id) { info ->
             data = info
@@ -286,7 +290,7 @@ fun Appareil(navController: NavController) {
                 }
             }
             Button(
-                onClick = { /* TODO: Handle Click Action */ },
+                onClick = { viewModelLocation.fetchUserLocation("66") },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222)),
                 modifier = Modifier

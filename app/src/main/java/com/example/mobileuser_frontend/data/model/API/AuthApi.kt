@@ -18,7 +18,7 @@ interface AuthApi {
     suspend fun signIn(@Body request: SignInRequest): SignInResponse
     @GET("/auth/validate")
     suspend fun validateToken(@Header("Authorization") token: String): TokenValidationResponse
-    @POST("/aidant/signup")
+    @POST("/auth/signup")
     suspend fun signUp(@Body request: SignUpRequest): SignUpResponse
     @POST("aidant/pair")
     fun pairWithAidant(@Body dto: PairAidantDto): Call<PairResponse>
