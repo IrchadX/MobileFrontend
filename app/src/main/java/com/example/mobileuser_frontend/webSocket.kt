@@ -1,150 +1,163 @@
 package com.example.mobileuser_frontend
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
-import java.nio.ByteBuffer
-import java.util.concurrent.atomic.AtomicBoolean
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okio.ByteString
+import java.util.concurrent.TimeUnit
 
+/**
+ * WebSocket client implementation for audio streaming
+ */
 class AudioWebSocketClient(
-    serverUri: URI,
-    headers: Map<String, String>? = null,
-    private val messageCallback: (String) -> Unit // Callback for incoming text messages
-) : WebSocketClient(serverUri, headers) {
-
+    private val serverUri: URI,
+    private val headers: Map<String, String> = emptyMap(),
+    private val onMessageCallback: (String) -> Unit = {}
+) {
     private val TAG = "AudioWebSocketClient"
+    private var webSocket: WebSocket? = null
     private var isRecording = false
-    private var bytesSent = 0
-    private var lastLogTime = 0L
-    private val LOG_INTERVAL = 10000 // Log every second
-    private val isConnecting = AtomicBoolean(false)
-    private val reconnectHandler = Handler(Looper.getMainLooper())
-    private var reconnectAttempts = 0
-    private val MAX_RECONNECT_ATTEMPTS = 5
-    private val RECONNECT_DELAY_MS = 2000L // 2 seconds
+
+    // Exposed flag to check connection state
+    val isOpen: Boolean
+        get() = webSocket != null
 
     init {
-        this.connectionLostTimeout = 10 // Faster detection of connection loss
-        Log.d(TAG, "AudioWebSocketClient initialized with URI: $serverUri")
+        Log.d(TAG, "Initializing WebSocketClient for $serverUri")
     }
 
-    override fun onOpen(handshakedata: ServerHandshake?) {
-        Log.d(TAG, "Connection opened successfully to $uri")
-        reconnectAttempts = 0 // Reset on successful connection
-        isConnecting.set(false)
-    }
+    /**
+     * Connect to the WebSocket server
+     */
+    fun connect() {
+        try {
+            Log.d(TAG, "Connecting to WebSocket server: $serverUri")
 
-    override fun onClose(code: Int, reason: String?, remote: Boolean) {
-        Log.d(TAG, "Connection closed: code=$code, reason=$reason, remote=$remote")
-        Log.d(TAG, "Total bytes sent before disconnect: $bytesSent")
+            // Create OkHttp client with reasonable timeouts
+            val client = OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build()
 
-        // Try to reconnect if we were recording
-        if (isRecording && !isConnecting.get()) {
-            attemptReconnect()
-        }
-    }
+            // Build request with headers
+            val requestBuilder = Request.Builder()
+                .url(serverUri.toString())
 
-    override fun onMessage(message: String?) {
-        Log.d(TAG, "Received text message from server: $message")
+            // Add headers if provided
+            headers.forEach { (key, value) ->
+                requestBuilder.addHeader(key, value)
+            }
 
-        // Forward received message to callback
-        message?.let { messageCallback(it) }
-    }
-
-    override fun onMessage(bytes: ByteBuffer?) {
-        val size = bytes?.remaining() ?: 0
-        Log.d(TAG, "Received binary message of size: $size bytes")
-    }
-
-    override fun onError(ex: Exception?) {
-        Log.e(TAG, "WebSocket error: ${ex?.message}")
-        ex?.printStackTrace()
-
-        // If connecting fails, try to reconnect
-        if (!isOpen && isRecording && !isConnecting.get()) {
-            attemptReconnect()
-        }
-    }
-
-    private fun attemptReconnect() {
-        if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            Log.e(TAG, "Max reconnection attempts reached. Giving up.")
-            return
-        }
-
-        if (isConnecting.compareAndSet(false, true)) {
-            reconnectAttempts++
-            Log.d(TAG, "Attempting to reconnect... (Attempt $reconnectAttempts)")
-
-            reconnectHandler.postDelayed({
-                try {
-                    reconnect()
-                    Log.d(TAG, "Reconnect attempt initiated")
-                } catch (e: Exception) {
-                    Log.e(TAG, "Reconnection failed: ${e.message}")
-                    isConnecting.set(false)
-
-                    // Schedule another attempt
-                    if (isRecording) {
-                        attemptReconnect()
-                    }
+            // Create and connect WebSocket
+            webSocket = client.newWebSocket(requestBuilder.build(), object : WebSocketListener() {
+                override fun onOpen(webSocket: WebSocket, response: Response) {
+                    Log.d(TAG, "WebSocket connection established")
+                    // Send a test message to verify connection
+                    webSocket.send("CONNECTION_ESTABLISHED")
                 }
-            }, RECONNECT_DELAY_MS)
+
+                override fun onMessage(webSocket: WebSocket, text: String) {
+                    Log.d(TAG, "Received text message: $text")
+                    // Forward messages to callback handler
+                    onMessageCallback(text)
+                }
+
+                override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+                    Log.d(TAG, "Received binary message: ${bytes.size} bytes")
+                    // We don't expect binary responses from the server
+                }
+
+                override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                    Log.d(TAG, "WebSocket closing: $code $reason")
+                    webSocket.close(1000, null)
+                    this@AudioWebSocketClient.webSocket = null
+                }
+
+                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                    Log.d(TAG, "WebSocket closed: $code $reason")
+                    this@AudioWebSocketClient.webSocket = null
+                }
+
+                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    Log.e(TAG, "WebSocket failure: ${t.message}", t)
+                    this@AudioWebSocketClient.webSocket = null
+
+                    // Attempt reconnection after failure (optional)
+                    // reconnect()
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Error connecting to WebSocket: ${e.message}", e)
         }
     }
 
-    fun sendAudioData(audioData: ByteArray) {
-        if (isOpen && isRecording) {
+    /**
+     * Send audio data over the WebSocket
+     */
+    fun sendAudioData(data: ByteArray) {
+        if (isRecording && webSocket != null) {
             try {
-                send(audioData)
-                bytesSent += audioData.size
-
-                // Log progress periodically to avoid flooding
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastLogTime > LOG_INTERVAL) {
-                    Log.d(TAG, "Sent ${audioData.size} bytes, total sent: $bytesSent bytes")
-                    lastLogTime = currentTime
-                }
+                // Send binary audio data
+                val byteString = ByteString.of(*data)
+                webSocket?.send(byteString)
             } catch (e: Exception) {
-                Log.e(TAG, "Error sending audio data: ${e.message}")
-            }
-        } else {
-            if (!isOpen && isRecording && !isConnecting.get()) {
-                Log.e(TAG, "WebSocket connection is not open, attempting to reconnect")
-                attemptReconnect()
+                Log.e(TAG, "Error sending audio data: ${e.message}", e)
             }
         }
     }
 
+    /**
+     * Send a text message over the WebSocket
+     */
+    fun sendMessage(message: String) {
+        try {
+            Log.d(TAG, "Sending message: $message")
+            webSocket?.send(message)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sending message: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Set recording state to true
+     */
     fun startRecording() {
-        Log.d(TAG, "Starting recording")
         isRecording = true
-        bytesSent = 0
-        lastLogTime = System.currentTimeMillis()
+        sendMessage("START_RECORDING")
+    }
 
-        // Make sure we're connected when starting recording
-        if (!isOpen && !isConnecting.get()) {
-            attemptReconnect()
+    /**
+     * Set recording state to false
+     */
+    fun stopRecording() {
+        isRecording = false
+        sendMessage("STOP_RECORDING")
+    }
+
+    /**
+     * Close the WebSocket connection
+     */
+    fun close() {
+        try {
+            isRecording = false
+            webSocket?.close(1000, "Client closing connection")
+            webSocket = null
+            Log.d(TAG, "WebSocket connection closed")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error closing WebSocket: ${e.message}", e)
         }
     }
 
-    fun stopRecording() {
-        Log.d(TAG, "Stopping recording. Total bytes sent: $bytesSent")
-        isRecording = false
-    }
-
-    override fun connect() {
-        Log.d(TAG, "Connecting to WebSocket server: $uri")
-        isConnecting.set(true)
-        super.connect()
-    }
-
-    override fun reconnect() {
-        Log.d(TAG, "Reconnecting to WebSocket server: $uri")
-        isConnecting.set(true)
-        super.reconnect()
+    /**
+     * Attempt to reconnect to the WebSocket server
+     */
+    fun reconnect() {
+        close()
+        connect()
     }
 }

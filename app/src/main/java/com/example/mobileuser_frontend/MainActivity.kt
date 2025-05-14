@@ -3,6 +3,7 @@ package com.example.mobileuser_frontend
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresExtension
@@ -55,6 +56,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private val TAG = "MainActivity"
+
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter",
         "UnusedMaterial3ScaffoldPaddingParameter"
@@ -83,11 +86,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             MobileUser_FrontendTheme {
                 val navController = rememberNavController()
+
+                // Set the NavController in the AudioService for voice navigation
+                setNavControllerForVoiceCommands(navController)
+
                 val coroutineScope = rememberCoroutineScope()
                 var isRecordingState by remember { mutableStateOf(false) }
-                var dragAmount by remember { mutableStateOf(0f) }
                 val density = LocalDensity.current
-                val sensitivity = with(density) { 70.dp.toPx() } // Convert dp to pixels
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
                 Scaffold(
@@ -128,6 +133,18 @@ class MainActivity : ComponentActivity() {
                     PageNavigation(navController, modifier = Modifier.padding(paddingValues))
                 }
             }
+        }
+    }
+
+    /**
+     * Set the NavController in the AudioService for voice navigation
+     */
+    private fun setNavControllerForVoiceCommands(navController: NavController) {
+        try {
+            audioService.setNavController(navController)
+            Log.d(TAG, "NavController successfully set for voice commands")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set NavController for voice commands: ${e.message}", e)
         }
     }
 

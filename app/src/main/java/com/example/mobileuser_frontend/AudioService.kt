@@ -12,6 +12,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.example.mobileuser_frontend.AudioWebSocketClient
 import com.example.mobileuser_frontend.VoiceCommandHandler
 import java.net.URI
@@ -36,17 +37,31 @@ class AudioService(private val context: Context) {
     )
 
     init {
-        // Initialize the voice command handler
+        // Initialize the voice command handler first
         voiceCommandHandler = VoiceCommandHandler(context)
+        Log.d(TAG, "VoiceCommandHandler initialized")
 
-        // Setup WebSocket client
+        // Setup WebSocket client with callback to the voice command handler
         setupWebSocketClient()
+    }
+
+    /**
+     * Set the navigation controller for the voice command handler
+     */
+    fun setNavController(navController: NavController) {
+        if (::voiceCommandHandler.isInitialized) {
+            voiceCommandHandler.setNavController(navController)
+            Log.d(TAG, "NavController set in AudioService and passed to VoiceCommandHandler")
+        } else {
+            Log.e(TAG, "VoiceCommandHandler not initialized, cannot set NavController")
+        }
     }
 
     private fun setupWebSocketClient() {
         try {
             // IMPORTANT: Use the correct IP address and protocol format
             // FIX: Added proper ws:// protocol prefix
+            // NOTE: Make sure to change this IP address to match your server
             val serverUri = URI("ws://172.20.10.2:8765") // Your Python server's IP
 
             // For local testing on the same device via ADB port forwarding:
@@ -65,6 +80,7 @@ class AudioService(private val context: Context) {
                 headers
             ) { message ->
                 // Process received messages through the voice command handler
+                Log.d(TAG, "Received WebSocket message, forwarding to VoiceCommandHandler: $message")
                 voiceCommandHandler.processWebSocketMessage(message)
             }
 
@@ -76,9 +92,12 @@ class AudioService(private val context: Context) {
             Handler(Looper.getMainLooper()).postDelayed({
                 if (webSocketClient.isOpen) {
                     Log.d(TAG, "WebSocket connection established successfully!")
+                    // Send a test message after connection is established
+                    webSocketClient.sendMessage("ANDROID_CLIENT_CONNECTED")
                 } else {
                     Log.e(TAG, "Failed to establish WebSocket connection after timeout")
-                    // Add UI feedback here to inform the user
+                    // Try reconnecting once
+                    webSocketClient.reconnect()
                 }
             }, 5000) // 5 second timeout
         } catch (e: Exception) {
@@ -115,7 +134,19 @@ class AudioService(private val context: Context) {
 
             audioRecord?.startRecording()
             isRecording.set(true)
-            webSocketClient.startRecording()
+
+            // Make sure WebSocket is open before starting
+            if (!webSocketClient.isOpen) {
+                Log.d(TAG, "WebSocket not connected, attempting to reconnect...")
+                webSocketClient.reconnect()
+
+                // Short delay to allow reconnection
+                Handler(Looper.getMainLooper()).postDelayed({
+                    webSocketClient.startRecording()
+                }, 1000)
+            } else {
+                webSocketClient.startRecording()
+            }
 
             Log.d(TAG, "Audio recording started with buffer size: $bufferSize")
 
