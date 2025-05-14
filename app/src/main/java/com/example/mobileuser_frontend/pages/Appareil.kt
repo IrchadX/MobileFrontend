@@ -302,7 +302,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                 }
             }
             Button(
-                onClick = { viewModelLocation.fetchUserLocation("66") },
+                onClick = {},
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222)),
                 modifier = Modifier

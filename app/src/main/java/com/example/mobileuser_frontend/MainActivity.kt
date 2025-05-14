@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -112,11 +113,15 @@ class MainActivity : ComponentActivity() {
                     navController.currentBackStackEntryAsState().value?.destination?.route
 
                 var isAuthenticated by remember { mutableStateOf(false) }
+                val context = LocalContext.current
+                val viewModel = LocationViewModel(context)
+
 
                 // Check authentication state
                 LaunchedEffect(Unit) {
                     authRepository.getUserId().collectLatest { userId ->
                         isAuthenticated = !userId.isNullOrEmpty()
+                        viewModel.startPeriodicLocationUpdates(userId.toString())
                     }
                 }
 
