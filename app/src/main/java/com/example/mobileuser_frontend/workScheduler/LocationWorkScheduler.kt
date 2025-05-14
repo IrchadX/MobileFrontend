@@ -17,7 +17,7 @@ object LocationWorkScheduler {
             .build()
 
         // Create the periodic work request
-        val locationWorkRequest = PeriodicWorkRequestBuilder<LocationWorker>(10, TimeUnit.MINUTES)
+        val locationWorkRequest = PeriodicWorkRequestBuilder<LocationWorker>(1, TimeUnit.MINUTES)
             .setInputData(inputData)
             .build()
 
