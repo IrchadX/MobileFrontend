@@ -2,12 +2,15 @@
 <network-security-config>
     <!-- Autorise le cleartext (HTTP/ws://) vers toutes les adresses, y compris les IPs -->
     <base-config cleartextTrafficPermitted="true" />
-
+    <domain-config> <domain includeSubdomains="true">77e1eb85b4154de4a7051ab63ff5efea.s1.eu.hivemq.cloud</domain>
     <debug-overrides>
         <trust-anchors>
             <!-- Trust user added CAs while debuggable only -->
             <certificates src="user" />
             <certificates src="system" />
         </trust-anchors>
+
     </debug-overrides>
+    </domain-config>
+
 </network-security-config>

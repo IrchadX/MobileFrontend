@@ -116,12 +116,12 @@ class MainActivity : ComponentActivity() {
                 val context = LocalContext.current
                 val viewModel = LocationViewModel(context)
 
-
                 // Check authentication state
                 LaunchedEffect(Unit) {
                     authRepository.getUserId().collectLatest { userId ->
                         isAuthenticated = !userId.isNullOrEmpty()
                         viewModel.startPeriodicLocationUpdates(userId.toString())
+
                     }
                 }
 

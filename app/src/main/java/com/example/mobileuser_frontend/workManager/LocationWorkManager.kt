@@ -66,6 +66,7 @@ class LocationWorker(private val context: Context, workerParams: WorkerParameter
         return try {
             val success = repository.fetchAndUpdateLocation(userId)
 
+
             if (success) {
                 Log.i(TAG, "Location updated successfully for user $userId")
                 Result.success()
