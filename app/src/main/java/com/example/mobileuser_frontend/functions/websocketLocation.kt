@@ -16,12 +16,12 @@ class LocationWebSocketClient {
     private var isConnected = false
 
 
-    private val serverUrl = "ws://192.168.39.120:9090/ws"
+    private val serverUrl = "wss://websocket-production-1b56.up.railway.app/"
 
     fun connectWebSocket(onConnected: (() -> Unit)? = null, onFailure: ((String) -> Unit)? = null) {
         val request = Request.Builder()
             .url(serverUrl)
-            .addHeader("Origin", "http://192.168.39.120")
+           // .addHeader("Origin", "http://192.168.39.120")
             .build()
 
         val listener = object : WebSocketListener() {
