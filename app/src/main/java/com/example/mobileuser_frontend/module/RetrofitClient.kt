@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://localhost:3000"
+    private const val BASE_URL = "http://172.20.10.3:3000"
     //private const val BASE_URL = "https://f890-41-111-189-175.ngrok-free.app"
 
     // Logging interceptor (useful for debugging)
