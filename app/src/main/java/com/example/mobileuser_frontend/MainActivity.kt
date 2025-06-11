@@ -65,8 +65,9 @@ class MainActivity : ComponentActivity() {
     private val PERMISSION_REQUEST_CODE = 200
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
 
-    private lateinit var voiceCommandHandler: VoiceCommandHandler
-    private lateinit var webSocketManager: WebSocketManager
+    // SOLUTION 1: Use local variables for smart cast
+    private var voiceCommandHandler: VoiceCommandHandler? = null
+    private var webSocketManager: WebSocketManager? = null
     private lateinit var authViewModel: AuthViewModel
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -77,105 +78,127 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize the voice command handler
-        voiceCommandHandler = VoiceCommandHandler(this)
+        Log.d(TAG, "=== ONCREATE START ===")
 
-        // Initialize WebSocket manager
-        webSocketManager = WebSocketManager(this, voiceCommandHandler)
+        try {
+            // Initialize voice command handler first
+            voiceCommandHandler = VoiceCommandHandler(this)
+            Log.d(TAG, "✅ VoiceCommandHandler initialized")
 
-        // Check for audio recording permission
-        if (!checkPermission()) {
-            requestPermission()
-        }
+            // SOLUTION 1: Use local variable for smart cast
+            val voiceHandler = voiceCommandHandler!! // Safe because we just initialized it
 
-        AuthViewModel.initialize(applicationContext)
-        val authRepository = AuthRepository(applicationContext)
-        authViewModel = ViewModelProvider(
-            this,
-            AuthViewModelFactory(authRepository)
-        )[AuthViewModel::class.java]
+            // Initialize WebSocket manager with the handler
+            webSocketManager = WebSocketManager(this, voiceHandler)
+            Log.d(TAG, "✅ WebSocketManager initialized")
 
-        setContent {
-            MobileUser_FrontendTheme {
-                val navController = rememberNavController()
-                var dragAmount by remember { mutableStateOf(0f) }
-                val density = LocalDensity.current
-                val sensitivity = with(density) { 70.dp.toPx() } // Convert dp to pixels
-                val currentRoute =
-                    navController.currentBackStackEntryAsState().value?.destination?.route
+            val wsManager = webSocketManager!! // Safe because we just initialized it
 
-                var isAuthenticated by remember { mutableStateOf(false) }
-                val context = LocalContext.current
-                val viewModel = LocationViewModel(context)
+            // Connect them together
+            voiceHandler.setWebSocketManager(wsManager)
+            Log.d(TAG, "✅ Components connected")
 
-                // State for microphone recording
-                var isRecording by remember { mutableStateOf(false) }
+            // Check for audio recording permission
+            if (!checkPermission()) {
+                requestPermission()
+            }
 
-                // Set up the recording state callback
-                LaunchedEffect(Unit) {
-                    webSocketManager.onRecordingStateChanged = { recording ->
-                        isRecording = recording
+            AuthViewModel.initialize(applicationContext)
+            val authRepository = AuthRepository(applicationContext)
+            authViewModel = ViewModelProvider(
+                this,
+                AuthViewModelFactory(authRepository)
+            )[AuthViewModel::class.java]
+
+            setContent {
+                MobileUser_FrontendTheme {
+                    val navController = rememberNavController()
+                    var dragAmount by remember { mutableStateOf(0f) }
+                    val density = LocalDensity.current
+                    val sensitivity = with(density) { 70.dp.toPx() }
+                    val currentRoute =
+                        navController.currentBackStackEntryAsState().value?.destination?.route
+
+                    var isAuthenticated by remember { mutableStateOf(false) }
+                    val context = LocalContext.current
+                    val viewModel = LocationViewModel(context)
+
+                    // State for microphone recording
+                    var isRecording by remember { mutableStateOf(false) }
+
+                    // Set up the recording state callback
+                    LaunchedEffect(Unit) {
+                        // SOLUTION 1: Use local variable again
+                        wsManager.onRecordingStateChanged = { recording ->
+                            isRecording = recording
+                        }
+
+                        // Set the navigation controller for voice commands
+                        voiceHandler.setNavController(navController)
+                        Log.d(TAG, "✅ NavController set for voice commands")
                     }
 
-                    // Set the navigation controller for voice commands
-                    voiceCommandHandler.setNavController(navController)
-                }
-
-                // Check authentication state
-                LaunchedEffect(Unit) {
-                    authRepository.getUserId().collectLatest { userId ->
-                        isAuthenticated = !userId.isNullOrEmpty()
-                        viewModel.startPeriodicLocationUpdates(userId.toString())
-                    }
-                }
-
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    LOCATION_PERMISSION_REQUEST_CODE
-                )
-
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                        .padding(WindowInsets.navigationBars.asPaddingValues())
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures { _, dragAmount ->
-                                if (isAuthenticated) {
-                                    if (dragAmount < -40) {
-                                        // Swipe right to go back to Home
-                                        navController.navigate(Screens.Profil.route) { popUpTo(0) }
-                                    }
-                                    if (dragAmount > 40) {
-                                        // Swipe right to go back to Home
-                                        navController.navigate(Screens.Parametre.route) { popUpTo(0) }
-                                    }
-                                } else {
-                                    navController.navigate(Screens.SignInScreen.route) {
-                                        popUpTo(Screens.MainScreen.route) { inclusive = true }
-                                    }
-                                }
-                            }
-                        },
-
-                    bottomBar = {
-                        if (currentRoute !in listOf("SignInScreen", "SignUpScreen")) {
-                            NavBar(
-                                navController = navController,
-                                isRecording = isRecording,
-                                onMicrophoneClick = {
-                                    webSocketManager.toggleRecording()
-                                }
-                            )
+                    // Check authentication state
+                    LaunchedEffect(Unit) {
+                        authRepository.getUserId().collectLatest { userId ->
+                            isAuthenticated = !userId.isNullOrEmpty()
+                            viewModel.startPeriodicLocationUpdates(userId.toString())
                         }
                     }
-                ) { paddingValues ->
-                    PageNavigation(
-                        navController,
-                        modifier = Modifier.padding(paddingValues),
-                        authRepository
+
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        LOCATION_PERMISSION_REQUEST_CODE
                     )
+
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize()
+                            .padding(WindowInsets.navigationBars.asPaddingValues())
+                            .pointerInput(Unit) {
+                                detectHorizontalDragGestures { _, dragAmount ->
+                                    if (isAuthenticated) {
+                                        if (dragAmount < -40) {
+                                            navController.navigate(Screens.Profil.route) { popUpTo(0) }
+                                        }
+                                        if (dragAmount > 40) {
+                                            navController.navigate(Screens.Parametre.route) { popUpTo(0) }
+                                        }
+                                    } else {
+                                        navController.navigate(Screens.SignInScreen.route) {
+                                            popUpTo(Screens.MainScreen.route) { inclusive = true }
+                                        }
+                                    }
+                                }
+                            },
+
+                        bottomBar = {
+                            if (currentRoute !in listOf("SignInScreen", "SignUpScreen")) {
+                                NavBar(
+                                    navController = navController,
+                                    isRecording = isRecording,
+                                    onMicrophoneClick = {
+                                        wsManager.toggleRecording()
+                                    }
+                                )
+                            }
+                        }
+                    ) { paddingValues ->
+                        PageNavigation(
+                            navController,
+                            modifier = Modifier.padding(paddingValues),
+                            authRepository,
+                            voiceHandler // Pass the local variable
+                        )
+                    }
                 }
             }
+
+            Log.d(TAG, "=== ONCREATE SUCCESS ===")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error in onCreate: ${e.message}", e)
+            throw e // Re-throw to show in crash logs
         }
     }
 
@@ -211,9 +234,61 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        webSocketManager.cleanup()
+        Log.d(TAG, "=== ONDESTROY START ===")
+        webSocketManager?.cleanup()
+        Log.d(TAG, "=== ONDESTROY COMPLETE ===")
+    }
+
+    // SOLUTION 1: Use local variable approach
+    fun onLanguageChangedFromUI(newLanguage: String) {
+        Log.d(TAG, "=== LANGUAGE CHANGE FROM UI ===")
+        Log.d(TAG, "Language change requested: $newLanguage")
+
+        val handler = voiceCommandHandler // Create local variable
+        if (handler != null) {
+            handler.onLanguageChanged()
+            Log.d(TAG, "✅ VoiceCommandHandler notified of language change")
+        } else {
+            Log.e(TAG, "❌ VoiceCommandHandler is null - cannot process language change")
+        }
+
+        Log.d(TAG, "=== LANGUAGE CHANGE FROM UI END ===")
     }
 }
+
+// ALTERNATIVE SOLUTION 2: Use lateinit (if you're sure it will be initialized)
+/*
+class MainActivity : ComponentActivity() {
+    private val TAG = "MainActivity"
+    private val PERMISSION_REQUEST_CODE = 200
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
+    // Use lateinit instead of nullable
+    private lateinit var voiceCommandHandler: VoiceCommandHandler
+    private lateinit var webSocketManager: WebSocketManager
+    private lateinit var authViewModel: AuthViewModel
+
+    // Then you can use them directly without null checks
+    // voiceCommandHandler.setWebSocketManager(webSocketManager)
+    // But be careful - accessing before initialization will crash
+}
+*/
+
+// ALTERNATIVE SOLUTION 3: Use by lazy delegation
+/*
+class MainActivity : ComponentActivity() {
+    private val TAG = "MainActivity"
+    private val PERMISSION_REQUEST_CODE = 200
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
+    private val voiceCommandHandler by lazy { VoiceCommandHandler(this) }
+    private val webSocketManager by lazy { WebSocketManager(this, voiceCommandHandler) }
+    private lateinit var authViewModel: AuthViewModel
+
+    // These will be initialized on first access
+    // voiceCommandHandler.setWebSocketManager(webSocketManager)
+}
+*/
 
 class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -280,7 +355,7 @@ fun NavBar(
 
         FloatingActionButton(
             onClick = onMicrophoneClick,
-            containerColor = if (isRecording) Color(0xFFFF4444) else Color(0xff3aafa9), // Red when recording, original color when not
+            containerColor = if (isRecording) Color(0xFFFF4444) else Color(0xff3aafa9),
             shape = CircleShape,
             contentColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),

@@ -237,6 +237,27 @@ class WebSocketManager(
         return isRecording.get()
     }
 
+    // Add this method to your WebSocketManager class:
+
+    fun sendMessage(message: String) {
+        Log.d(TAG, "Sending message to server: $message")
+
+        if (webSocketClient?.isOpen == true) {
+            webSocketClient?.sendMessage(message)
+            Log.d(TAG, "Message sent successfully: $message")
+        } else {
+            Log.w(TAG, "WebSocket not connected, cannot send message: $message")
+            // Optionally attempt to reconnect
+            reconnectWebSocket()
+        }
+    }
+
+    // Also add this method to send JSON messages specifically:
+    fun sendJsonMessage(jsonMessage: String) {
+        Log.d(TAG, "Sending JSON message to server: $jsonMessage")
+        sendMessage(jsonMessage)
+    }
+
     private fun checkPermission(): Boolean {
         val hasPermission = ActivityCompat.checkSelfPermission(
             context,

@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifier, authRepository: AuthRepository) {
+fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifier, authRepository: AuthRepository, voiceCommandHandler: VoiceCommandHandler) {
 
     var isAuthenticated by remember { mutableStateOf(false) }
 
@@ -97,7 +97,7 @@ fun PageNavigation(navController: NavHostController, modifier: Modifier = Modifi
                 AddAidant(navController = navController)
             }
             composable(route = Screens.Preferences.route) {
-                Preferences(navController = navController)
+                Preferences(navController = navController, voiceCommandHandler = voiceCommandHandler)
             }
             composable(route = Screens.Appel.route) {
                 Appel(navController = navController)

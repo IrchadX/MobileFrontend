@@ -1,5 +1,8 @@
 package com.example.mobileuser_frontend.pages
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,10 +16,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,16 +32,73 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.module.CustomDropdown
+import com.example.mobileuser_frontend.module.ListItems
+import com.example.mobileuser_frontend.VoiceCommandHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-
-/*@Preview
 @Composable
-private fun PreferencesPreview() {
-    Preferences()
-}*/
-@Composable
-fun Preferences(navController: NavController) {
+fun Preferences(
+    navController: NavController,
+    voiceCommandHandler: VoiceCommandHandler? = null
+) {
+    val context = LocalContext.current
+    val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+    // Language options - Convert to ListItems
+    val languageOptions = listOf(
+        ListItems("Français", "fr"),
+        ListItems("English", "en")
+    )
+
+    // Voice options - Convert to ListItems
+    val voiceOptions = listOf(
+        ListItems("Voix Féminine", "female"),
+        ListItems("Voix Masculine", "male")
+    )
+
+    // Sensitivity options - Convert to ListItems
+    val sensitivityOptions = listOf(
+        ListItems("Faible", "low"),
+        ListItems("Moyen", "medium"),
+        ListItems("Élevé", "high")
+    )
+
+    // Get current saved values
+    var selectedLanguage by remember {
+        mutableStateOf(
+            when(sharedPref.getString("selected_language", "fr")) {
+                "fr" -> "Français"
+                "en" -> "English"
+                else -> "Français"
+            }
+        )
+    }
+
+    var selectedVoice by remember {
+        mutableStateOf(
+            when(sharedPref.getString("selected_voice", "female")) {
+                "female" -> "Voix Féminine"
+                "male" -> "Voix Masculine"
+                else -> "Voix Féminine"
+            }
+        )
+    }
+
+    var selectedSensitivity by remember {
+        mutableStateOf(
+            when(sharedPref.getString("selected_sensitivity", "medium")) {
+                "low" -> "Faible"
+                "medium" -> "Moyen"
+                "high" -> "Élevé"
+                else -> "Moyen"
+            }
+        )
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -64,7 +129,6 @@ fun Preferences(navController: NavController) {
                 .padding(start = 10.dp),
         )
 
-
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
             modifier = Modifier
@@ -85,9 +149,10 @@ fun Preferences(navController: NavController) {
 
             CustomDropdown(
                 label = "",
-                items = poiOptions,
-                initialValue = "Choisir Votre Langue préférée",
-                onItemSelected = {
+                items = languageOptions,
+                initialValue = selectedLanguage,
+                onItemSelected = { selectedItem ->
+                    selectedLanguage = selectedItem.label
                 },
             )
 
@@ -101,11 +166,13 @@ fun Preferences(navController: NavController) {
                 modifier = Modifier
                     .wrapContentHeight(align = Alignment.CenterVertically)
             )
+
             CustomDropdown(
                 label = "",
-                items = poiOptions,
-                initialValue = "Choisir Votre voix préférée",
-                onItemSelected = {
+                items = voiceOptions,
+                initialValue = selectedVoice,
+                onItemSelected = { selectedItem ->
+                    selectedVoice = selectedItem.label
                 },
             )
 
@@ -114,7 +181,8 @@ fun Preferences(navController: NavController) {
                 thickness = 2.dp,
                 color = Color.Gray.copy(alpha = 0.3f)
             )
-//Vibration Section
+
+            // Vibration Section
             Text(
                 text = "Vibration",
                 color = Color(0xff17252a),
@@ -124,6 +192,7 @@ fun Preferences(navController: NavController) {
                 ),
                 modifier = Modifier.align(Alignment.Start),
             )
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
                 modifier = Modifier
@@ -143,20 +212,83 @@ fun Preferences(navController: NavController) {
 
                 CustomDropdown(
                     label = "",
-                    items = poiOptions,
-                    initialValue = "Choisir Votre niveau de sensibilité",
-                    onItemSelected = {
+                    items = sensitivityOptions,
+                    initialValue = selectedSensitivity,
+                    onItemSelected = { selectedItem ->
+                        selectedSensitivity = selectedItem.label
                     },
                 )
+
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     thickness = 2.dp,
                     color = Color.Gray.copy(alpha = 0.3f)
                 )
-
             }
+
             Button(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    Log.d("Preferences", "Save button clicked")
+
+                    // Save preferences
+                    val editor = sharedPref.edit()
+
+                    // Convert display language to language code
+                    val languageCode = when(selectedLanguage) {
+                        "Français" -> "fr"
+                        "English" -> "en"
+                        else -> "fr"
+                    }
+
+                    // Convert display voice to voice code
+                    val voiceCode = when(selectedVoice) {
+                        "Voix Féminine" -> "female"
+                        "Voix Masculine" -> "male"
+                        else -> "female"
+                    }
+
+                    // Convert display sensitivity to sensitivity code
+                    val sensitivityCode = when(selectedSensitivity) {
+                        "Faible" -> "low"
+                        "Moyen" -> "medium"
+                        "Élevé" -> "high"
+                        else -> "medium"
+                    }
+
+                    // Check if language changed BEFORE saving
+                    val previousLanguage = sharedPref.getString("selected_language", "fr")
+                    val languageChanged = previousLanguage != languageCode
+
+                    Log.d("Preferences", "Previous language: $previousLanguage, New language: $languageCode, Changed: $languageChanged")
+
+                    // Save to SharedPreferences
+                    editor.putString("selected_language", languageCode)
+                    editor.putString("selected_voice", voiceCode)
+                    editor.putString("selected_sensitivity", sensitivityCode)
+                    val saved = editor.commit() // Use commit() instead of apply() for immediate save
+
+                    Log.d("Preferences", "Preferences saved: $saved")
+
+                    // Send language update to Python server if language changed
+                    if (languageChanged && voiceCommandHandler != null) {
+                        Log.d("Preferences", "Language changed, notifying server immediately")
+
+                        // Send update immediately before navigation
+                        voiceCommandHandler.onLanguageChanged()
+
+                        // Use coroutine to add small delay before navigation
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(500) // Give time for WebSocket message to be sent
+                            navController.popBackStack()
+                        }
+                    } else {
+                        if (voiceCommandHandler == null) {
+                            Log.w("Preferences", "VoiceCommandHandler is null - cannot notify server")
+                        }
+                        // Navigate back immediately if no language change
+                        navController.popBackStack()
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
@@ -173,7 +305,6 @@ fun Preferences(navController: NavController) {
                     )
                 )
             }
-
-        }   }
+        }
+    }
 }
-
