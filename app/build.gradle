@@ -62,6 +62,7 @@ dependencies {
     implementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'androidx.media3:media3-common-ktx:1.7.1'
     implementation 'com.google.firebase:firebase-crashlytics-buildtools:3.0.4'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
 
     // Compose
     def compose_version = "1.5.1" // Use the latest stable Compose version compatible with the Compiler

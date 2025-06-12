@@ -2,14 +2,19 @@ package com.example.mobileuser_frontend
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresExtension
 import androidx.navigation.NavController
+import com.example.mobileuser_frontend.functions.fetchDeviceInfo
 import com.example.mobileuser_frontend.functions.makePhoneCall
 import com.example.mobileuser_frontend.module.RetrofitClient
 import com.example.mobileuser_frontend.module.ListItems
+import com.example.mobileuser_frontend.repository.AuthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.json.JSONException
@@ -17,12 +22,60 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 class VoiceCommandHandler(private val context: Context) {
+
+    private var ttsHandler: TTSHandler? = null
     private val TAG = "VoiceCommandHandler"
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var navController: NavController? = null
     private val sharedPref: SharedPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
     private var webSocketManager: WebSocketManager? = null
+
+    // Add AuthRepository to get userId consistently
+    private val authRepository = AuthRepository(context)
+
+    init {
+        ttsHandler = TTSHandler(context)
+        loadTTSPreferences()
+    }
+
+    // Load TTS preferences and apply them
+    private fun loadTTSPreferences() {
+        val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        val languageCode = sharedPref.getString("selected_language", "fr") ?: "fr"
+        val voiceGender = sharedPref.getString("selected_voice", "female") ?: "female"
+
+        Log.d("VoiceCommandHandler", "Loading TTS preferences: language=$languageCode, voice=$voiceGender")
+        ttsHandler?.updateFromPreferences(languageCode, voiceGender)
+    }
+
+    // Call this method when language changes in preferences
+
+
+    // Call this method when voice preference changes
+    fun onVoiceChanged() {
+        Log.d("VoiceCommandHandler", "Voice changed, reloading TTS preferences")
+        loadTTSPreferences()
+    }
+
+    // Method to test voice with current settings
+    fun testVoice() {
+        val sharedPref = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
+        val languageCode = sharedPref.getString("selected_language", "fr") ?: "fr"
+
+        val testMessage = when (languageCode) {
+            "en" -> "Voice test successful"
+            else -> "Test de voix réussi"
+        }
+
+        ttsHandler?.speak(testMessage)
+    }
+
+    private fun sendLanguageUpdateToServer() {
+        // Your existing server communication code here
+        // This sends the language change to your Python server
+    }
 
     fun setNavController(controller: NavController) {
         this.navController = controller
@@ -125,6 +178,8 @@ class VoiceCommandHandler(private val context: Context) {
 
         sendLanguageUpdate()
         showToast(getLocalizedMessage("language_changed"))
+        // Sync TTS language
+        ttsHandler?.setLanguage(currentLang)
 
         Log.d(TAG, "=== LANGUAGE CHANGE EVENT END ===")
     }
@@ -134,6 +189,18 @@ class VoiceCommandHandler(private val context: Context) {
         val lang = sharedPref.getString("selected_language", "fr") ?: "fr"
         Log.d(TAG, "getCurrentLanguage() returning: $lang")
         return lang
+    }
+
+    // FIXED: Helper function to get userId from AuthRepository
+    private suspend fun getUserId(): String? {
+        return try {
+            val userId = authRepository.getUserId().firstOrNull()
+            Log.d(TAG, "Retrieved userId from AuthRepository: '$userId'")
+            userId
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting userId from AuthRepository: ${e.message}", e)
+            null
+        }
     }
 
     // Emergency call commands with language support
@@ -190,6 +257,26 @@ class VoiceCommandHandler(private val context: Context) {
         }
     }
 
+    // Device commands with language support
+    private fun getDeviceCommands(): Map<String, String> {
+        return when (getCurrentLanguage()) {
+            "en" -> mapOf(
+                "battery" to "CHECK_BATTERY",
+                "device status" to "CHECK_DEVICE_STATUS",
+                "connection" to "CHECK_CONNECTION",
+                "device type" to "CHECK_DEVICE_TYPE",
+                "help" to "SHOW_HELP"
+            )
+            else -> mapOf( // French (default)
+                "batterie" to "CHECK_BATTERY",
+                "état appareil" to "CHECK_DEVICE_STATUS",
+                "connexion" to "CHECK_CONNECTION",
+                "type appareil" to "CHECK_DEVICE_TYPE",
+                "aide" to "SHOW_HELP",
+            )
+        }
+    }
+
     // Get localized messages
     private fun getLocalizedMessage(key: String): String {
         return when (getCurrentLanguage()) {
@@ -209,6 +296,13 @@ class VoiceCommandHandler(private val context: Context) {
                 "switching_to_french" -> "Switching to French..."
                 "switching_to_english" -> "Switching to English..."
                 "voice_language_changed" -> "Voice recognition language changed"
+                "help_intro" -> "Available voice commands:"
+                "help_device" -> "Device commands: battery, device status, connection, device type"
+                "help_navigation" -> "Navigation: main menu, home, profile, device, settings, preferences"
+                "help_emergency" -> "Emergency: call assistant, emergency, police, fire department, ambulance, relative"
+                "help_language" -> "Language: switch to french"
+                "help_system" -> "System: stop, help"
+
                 else -> key
             }
             else -> when (key) { // French (default)
@@ -227,6 +321,12 @@ class VoiceCommandHandler(private val context: Context) {
                 "switching_to_french" -> "Passage au français..."
                 "switching_to_english" -> "Passage à l'anglais..."
                 "voice_language_changed" -> "Langue de reconnaissance vocale changée"
+                "help_intro" -> "Commandes vocales disponibles:"
+                "help_device" -> "Commandes appareil: batterie, état appareil, connexion, type appareil"
+                "help_navigation" -> "Navigation: menu principal, accueil, profil, appareil, paramètres, préférences"
+                "help_emergency" -> "Urgence: faire appel, appeler assistance, urgence, police, pompiers, ambulance, proche"
+                "help_language" -> "Langue: changer en anglais"
+                "help_system" -> "Système: arrêter, aide"
                 else -> key
             }
         }
@@ -305,6 +405,15 @@ class VoiceCommandHandler(private val context: Context) {
                 return
             }
 
+            // ✅ Handle device commands from server
+            when (commandFull) {
+                "CHECK_BATTERY", "CHECK_DEVICE_STATUS", "CHECK_CONNECTION", "CHECK_DEVICE_TYPE" -> {
+                    handleDeviceCommand(commandFull)
+                    return
+                }
+
+            }
+
             // Handle emergency commands
             handleEmergencyCommand(commandFull)
             return
@@ -359,6 +468,9 @@ class VoiceCommandHandler(private val context: Context) {
 
         Log.d(TAG, "SharedPreferences updated: $saved (from $currentLanguage to $targetLanguage)")
 
+        ttsHandler?.setLanguage(targetLanguage)
+        Log.d(TAG, "TTS language updated to: $targetLanguage")
+
         // Show appropriate message based on target language
         val message = when (targetLanguage) {
             "fr" -> "Changement vers le français par commande vocale"
@@ -393,7 +505,8 @@ class VoiceCommandHandler(private val context: Context) {
         val emergencyCommands = getEmergencyCallCommands()
         val navigationCommands = getNavigationCommands()
 
-        // NOTE: Language change commands are now handled by the Python server
+        // NOTE: Language change commands are now
+        // by the Python server
         // The server will process voice commands and send us the language change notification
 
         // Priority 1: Check emergency/call commands first with exact phrase matching
@@ -451,6 +564,16 @@ class VoiceCommandHandler(private val context: Context) {
             if (text.matches(Regex(".*\\b$trigger\\b.*"))) {
                 Log.d(TAG, "Navigation command matched: $trigger -> $screen")
                 handleNavigation(screen)
+                return
+            }
+        }
+
+        // Priority 3: Check device commands
+        val deviceCommands = getDeviceCommands()
+        for ((trigger, command) in deviceCommands) {
+            if (text.matches(Regex(".*\\b$trigger\\b.*"))) {
+                Log.d(TAG, "Device command matched: $trigger -> $command")
+                handleDeviceCommand(command)
                 return
             }
         }
@@ -547,6 +670,122 @@ class VoiceCommandHandler(private val context: Context) {
         navigateToScreen(route)
     }
 
+    // FIXED: Updated device command handler to use AuthRepository for userId
+    private fun handleDeviceCommand(command: String) {
+        Log.d(TAG, "Handling device command: $command")
+
+        coroutineScope.launch {
+            val userId = getUserId()
+
+            if (userId.isNullOrEmpty()) {
+                Log.w(TAG, "User ID not found in AuthRepository")
+                val message = when (getCurrentLanguage()) {
+                    "en" -> "Unable to access device information - user not authenticated"
+                    else -> "Impossible d'accéder aux informations - utilisateur non authentifié"
+                }
+                ttsHandler?.speak(message)
+                return@launch
+            }
+
+            Log.d(TAG, "Using userId from AuthRepository: '$userId'")
+
+            when (command) {
+                "CHECK_BATTERY" -> {
+                    fetchDeviceInfo(userId) { deviceData ->
+                        Log.d(TAG, "Battery check - Device data received: $deviceData")
+                        deviceData?.let { data ->
+                            Log.d(TAG, "Database battery level: ${data.battery_capacity}%")
+                            ttsHandler?.announceBattery(data.battery_capacity, getCurrentLanguage())
+                        } ?: run {
+                            Log.w(TAG, "Device data is null - cannot get battery from database")
+                            val message = when (getCurrentLanguage()) {
+                                "en" -> "Battery information not available from device database"
+                                else -> "Information de batterie non disponible dans la base de données"
+                            }
+                            ttsHandler?.speak(message)
+                        }
+                    }
+                }
+                "SHOW_HELP" -> {
+                    showHelpCommands()
+                }
+
+                "CHECK_DEVICE_STATUS" -> {
+                    fetchDeviceInfo(userId) { deviceData ->
+                        Log.d(TAG, "Device status check - Data received: $deviceData")
+                        deviceData?.let { data ->
+                            ttsHandler?.announceDeviceState(data.state, getCurrentLanguage())
+                        } ?: run {
+                            Log.w(TAG, "Device status data is null")
+                            val message = when (getCurrentLanguage()) {
+                                "en" -> "Device status not available from database"
+                                else -> "État de l'appareil non disponible dans la base de données"
+                            }
+                            ttsHandler?.speak(message)
+                        }
+                    }
+                }
+
+                "CHECK_CONNECTION" -> {
+                    // FIXED: Check device connection status from database, not WebSocket
+                    fetchDeviceInfo(userId) { deviceData ->
+                        Log.d(TAG, "Connection check - Data received: $deviceData")
+                        deviceData?.let { data ->
+                            // Check if device state indicates connection
+                            val isConnected = data.state.equals("Connected", ignoreCase = true) ||
+                                    data.state.equals("Connecté", ignoreCase = true) ||
+                                    !data.state.equals("Deconnected", ignoreCase = true)
+                            Log.d(TAG, "Device connection status from DB: $isConnected (state: ${data.state})")
+                            ttsHandler?.announceConnectionStatus(isConnected, getCurrentLanguage())
+                        } ?: run {
+                            Log.w(TAG, "Device connection data is null")
+                            val message = when (getCurrentLanguage()) {
+                                "en" -> "Connection status not available from database"
+                                else -> "État de connexion non disponible dans la base de données"
+                            }
+                            ttsHandler?.speak(message)
+                        }
+                    }
+                }
+
+                "CHECK_DEVICE_TYPE" -> {
+                    fetchDeviceInfo(userId) { deviceData ->
+                        Log.d(TAG, "Device type check - Data received: $deviceData")
+                        deviceData?.let { data ->
+                            ttsHandler?.announceDeviceType(data.type, getCurrentLanguage())
+                        } ?: run {
+                            Log.w(TAG, "Device type data is null")
+                            val message = when (getCurrentLanguage()) {
+                                "en" -> "Device type not available from database"
+                                else -> "Type d'appareil non disponible dans la base de données"
+                            }
+                            ttsHandler?.speak(message)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun showHelpCommands() {
+        Log.d(TAG, "Showing help commands in language: ${getCurrentLanguage()}")
+
+        val helpMessages = listOf(
+            getLocalizedMessage("help_intro"),
+            getLocalizedMessage("help_device"),
+            getLocalizedMessage("help_navigation"),
+            getLocalizedMessage("help_emergency"),
+            getLocalizedMessage("help_language"),
+            getLocalizedMessage("help_system")
+        )
+
+        // Combine all help messages with pauses
+        val fullHelpText = helpMessages.joinToString(". ")
+
+        ttsHandler?.speak(fullHelpText, getCurrentLanguage())
+
+        // Also show toast for visual feedback
+        showToast(getLocalizedMessage("help_intro"))
+    }
     private fun navigateToScreen(route: String) {
         coroutineScope.launch(Dispatchers.Main) {
             try {
@@ -564,10 +803,12 @@ class VoiceCommandHandler(private val context: Context) {
         }
     }
 
-    // Add method to check connection status
+    // FIXED: Check device connection status from database instead of WebSocket
     fun checkConnectionStatus(): Boolean {
+        // This method should be updated to use the database connection status
+        // For now, returning WebSocket status as fallback, but ideally should fetch from DB
         val isConnected = webSocketManager?.isWebSocketConnected() ?: false
-        Log.d(TAG, "Connection status check: $isConnected")
+        Log.d(TAG, "WebSocket connection status check: $isConnected")
         return isConnected
     }
 
@@ -582,5 +823,10 @@ class VoiceCommandHandler(private val context: Context) {
                 Log.d(TAG, "Connection already established")
             }
         }
+    }
+
+    fun cleanup() {
+        ttsHandler?.shutdown()
+        ttsHandler = null
     }
 }

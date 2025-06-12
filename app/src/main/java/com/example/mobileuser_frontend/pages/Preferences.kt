@@ -226,6 +226,8 @@ fun Preferences(
                 )
             }
 
+            // Update the Save button onClick in your Preferences composable
+
             Button(
                 onClick = {
                     Log.d("Preferences", "Save button clicked")
@@ -255,11 +257,14 @@ fun Preferences(
                         else -> "medium"
                     }
 
-                    // Check if language changed BEFORE saving
+                    // Check if language or voice changed BEFORE saving
                     val previousLanguage = sharedPref.getString("selected_language", "fr")
+                    val previousVoice = sharedPref.getString("selected_voice", "female")
                     val languageChanged = previousLanguage != languageCode
+                    val voiceChanged = previousVoice != voiceCode
 
                     Log.d("Preferences", "Previous language: $previousLanguage, New language: $languageCode, Changed: $languageChanged")
+                    Log.d("Preferences", "Previous voice: $previousVoice, New voice: $voiceCode, Changed: $voiceChanged")
 
                     // Save to SharedPreferences
                     editor.putString("selected_language", languageCode)
@@ -269,23 +274,29 @@ fun Preferences(
 
                     Log.d("Preferences", "Preferences saved: $saved")
 
-                    // Send language update to Python server if language changed
-                    if (languageChanged && voiceCommandHandler != null) {
-                        Log.d("Preferences", "Language changed, notifying server immediately")
+                    // Send updates to VoiceCommandHandler if settings changed
+                    if (voiceCommandHandler != null) {
+                        if (languageChanged) {
+                            Log.d("Preferences", "Language changed, notifying server immediately")
+                            voiceCommandHandler.onLanguageChanged()
+                        } else if (voiceChanged) {
+                            Log.d("Preferences", "Voice changed, updating TTS")
+                            voiceCommandHandler.onVoiceChanged()
+                        }
 
-                        // Send update immediately before navigation
-                        voiceCommandHandler.onLanguageChanged()
-
-                        // Use coroutine to add small delay before navigation
-                        CoroutineScope(Dispatchers.Main).launch {
-                            delay(500) // Give time for WebSocket message to be sent
+                        // Test the voice with new settings
+                        if (languageChanged || voiceChanged) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(500) // Give time for TTS to update
+                                voiceCommandHandler.testVoice() // Test the new voice
+                                delay(1000) // Let the test complete before navigation
+                                navController.popBackStack()
+                            }
+                        } else {
                             navController.popBackStack()
                         }
                     } else {
-                        if (voiceCommandHandler == null) {
-                            Log.w("Preferences", "VoiceCommandHandler is null - cannot notify server")
-                        }
-                        // Navigate back immediately if no language change
+                        Log.w("Preferences", "VoiceCommandHandler is null - cannot update TTS settings")
                         navController.popBackStack()
                     }
                 },
