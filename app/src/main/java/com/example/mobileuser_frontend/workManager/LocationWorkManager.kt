@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresExtension
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
@@ -32,6 +33,7 @@ class LocationWorker(private val context: Context, workerParams: WorkerParameter
 
     private val repository = LocationRepository(context)
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override suspend fun doWork(): Result {
         val userId = inputData.getString("userId")
             ?: return Result.failure(workDataOf("error" to "User ID is missing"))

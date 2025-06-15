@@ -116,7 +116,10 @@ fun Parametre(navController: NavController, viewModel: AuthViewModel= viewModel(
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(2.dp))
-                        .padding(all = 10.dp),
+                        .padding(all = 10.dp)
+                        .semantics {
+                            contentDescription = "Informations Personnelles"
+                        },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff3AAFA9))
                 ) {
                     Text(
@@ -135,7 +138,10 @@ fun Parametre(navController: NavController, viewModel: AuthViewModel= viewModel(
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(2.dp))
-                        .padding(all = 10.dp),
+                        .padding(all = 10.dp)
+                        .semantics {
+                            contentDescription = "Préférences de Navigation"
+                        },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252A))
                 ) {
                     Text(

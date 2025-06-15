@@ -395,6 +395,7 @@ fun NavBar(navController: NavController,
                 .border(BorderStroke(4.dp, Color.White), CircleShape)
                 .align(Alignment.Center)
 
+
         ) {
             Image(
                 painter = painterResource(id = R.drawable.microphone),

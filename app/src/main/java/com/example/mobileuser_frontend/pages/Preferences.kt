@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -159,7 +161,10 @@ fun Preferences(navController: NavController) {
                 onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
+                    .height(40.dp)
+                    .semantics {
+                        contentDescription = "Sauvegarder"
+                    },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
                 elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
