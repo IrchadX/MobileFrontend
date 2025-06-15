@@ -6,10 +6,12 @@ import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Base64
 import android.util.Log
+import androidx.annotation.RequiresExtension
 import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +20,7 @@ import java.net.URI
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 class WebSocketManager(
     private val context: Context,
     private val voiceCommandHandler: VoiceCommandHandler
@@ -44,6 +47,7 @@ class WebSocketManager(
         setupWebSocketClient()
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun setupWebSocketClient() {
         try {
             val serverUri = URI("wss://7b9d-154-121-119-219.ngrok-free.app")
