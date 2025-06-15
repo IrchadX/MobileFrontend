@@ -36,6 +36,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -308,6 +310,9 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(90.dp)
+                    .semantics {
+                        contentDescription = "Signaler un problème"
+                    },
             ) {
                 Text(
                     text = "Signaler un problème",

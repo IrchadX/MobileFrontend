@@ -5,8 +5,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.os.Handler
-import android.os.Looper
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.core.app.ActivityCompat
 import com.example.mobileuser_frontend.data.model.LocationRequest
 import com.example.mobileuser_frontend.module.RetrofitClient
@@ -15,9 +15,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import java.net.SocketException
 
 class LocationRepository(private val context: Context) {
     private var wsClient: LocationWebSocketClient? = null
@@ -25,14 +25,26 @@ class LocationRepository(private val context: Context) {
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    val authRepository: AuthRepository = AuthRepository(context)
+
     // Track WebSocket connection state
     private var isWsConnected = false
+
+
 
     // Keep reference to the most recent location
     private var lastKnownLocation: Location? = null
 
-    suspend fun fetchAndUpdateLocation(userId: String): Boolean {
-        // Check if location permissions are granted
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    suspend fun fetchAndUpdateLocation(providedUserId: String): Boolean {
+        // Fetch userId from authRepository (on IO thread if needed)
+        val userId = withContext(Dispatchers.IO) {
+            authRepository.getUserId().firstOrNull() ?: ""
+        }
+
+
+        // Check location permissions
         if (
             ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -42,7 +54,7 @@ class LocationRepository(private val context: Context) {
         }
 
         // Fetch the last known location
-        lastKnownLocation = suspendCancellableCoroutine<Location?> { cont ->
+        val lastKnownLocation = suspendCancellableCoroutine<Location?> { cont ->
             val cancellationTokenSource = CancellationTokenSource()
             fusedLocationClient.getCurrentLocation(
                 Priority.PRIORITY_HIGH_ACCURACY,
@@ -65,23 +77,28 @@ class LocationRepository(private val context: Context) {
 
         // Initialize WebSocket if needed
         if (wsClient == null) {
-            initializeWebSocket()
+            println("Connecting to websocket...")
+            wsClient = LocationWebSocketClient()
+            wsClient?.onConnected = {
+                println("WebSocket confirmed connected — now sending location")
+                isWsConnected = true
+                wsClient?.sendLocation(lastKnownLocation.latitude, lastKnownLocation.longitude)
+            }
+            wsClient?.connectWebSocket(userId)
+        } else if (isWsConnected) {
+            println("WebSocket already connected — sending location")
+            wsClient?.sendLocation(lastKnownLocation.latitude, lastKnownLocation.longitude)
+        } else {
+            println("WebSocket not connected yet")
         }
-
-        // If WebSocket is already connected, send the location directly
-        if (isWsConnected) {
-            sendLocationViaWebSocket()
-        }
-        // Otherwise, location will be sent when the connection is established (in connectWebSocket)
-
-        // Create the location request for REST API
+        // Create location request for REST API
         val request = LocationRequest(
             userId = userId,
-            latitude = lastKnownLocation?.latitude.toString(),
-            longitude = lastKnownLocation?.longitude.toString()
+            latitude = lastKnownLocation.latitude.toString(),
+            longitude = lastKnownLocation.longitude.toString()
         )
 
-        // Send the location update to the server via REST API
+        // Send the location update to the server
         return try {
             println("Sending location update to the server via REST API")
             val response = withContext(Dispatchers.IO) {
@@ -95,7 +112,9 @@ class LocationRepository(private val context: Context) {
         }
     }
 
-    private fun initializeWebSocket() {
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    private fun initializeWebSocket(userId: String) {
         println("Initializing WebSocket client")
 
         // Create a new WebSocket client if needed
@@ -103,39 +122,13 @@ class LocationRepository(private val context: Context) {
             wsClient = LocationWebSocketClient()
         }
 
-        connectWebSocket()
+        wsClient?.connectWebSocket(userId)
+        isWsConnected = true
     }
 
-    private fun connectWebSocket() {
-        println("Attempting to connect to WebSocket server...")
 
-        wsClient?.connectWebSocket(
-            onConnected = {
-                println("WebSocket connected successfully!")
-                isWsConnected = true
 
-                // Send location once connected
-                sendLocationViaWebSocket()
-            },
-            onFailure = { errorMessage ->
-                println("WebSocket connection failed: $errorMessage")
-                isWsConnected = false
 
-                // Retry connection after delay
-                Handler(Looper.getMainLooper()).postDelayed({
-                    println("Retrying WebSocket connection...")
-                    connectWebSocket()
-                }, 5000) // Retry after 5 seconds
-            }
-        )
-    }
-
-    private fun sendLocationViaWebSocket() {
-        lastKnownLocation?.let { location ->
-            println("Sending location via WebSocket: ${location.latitude}, ${location.longitude}")
-            wsClient?.sendLocation(location.latitude, location.longitude)
-        } ?: println("⚠️ No location available to send via WebSocket")
-    }
 
     fun closeWebSocket() {
         println("Closing WebSocket connection")

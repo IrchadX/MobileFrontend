@@ -55,6 +55,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -224,7 +226,10 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                 .fillMaxHeight(0.3f)
                 .height(80.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .padding(all = 5.dp),
+                .padding(all = 5.dp)
+                .semantics {
+                    contentDescription = "Demande d'aide"
+                },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252a))
         ) {
             Text(

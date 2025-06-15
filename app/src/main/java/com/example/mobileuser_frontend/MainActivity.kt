@@ -75,6 +75,11 @@ class MainActivity : ComponentActivity() {
         "UnusedMaterialScaffoldPaddingParameter",
         "UnusedMaterial3ScaffoldPaddingParameter"
     )
+    private lateinit var authViewModel: AuthViewModel
+
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -196,10 +201,51 @@ class MainActivity : ComponentActivity() {
 
             Log.d(TAG, "=== ONCREATE SUCCESS ===")
 
+            // Create proper WebSocket headers
+            val headers = HashMap<String, String>()
+            headers["Connection"] = "Upgrade"
+            headers["Upgrade"] = "websocket"
+            headers["Sec-WebSocket-Version"] = "13"
+            headers["Sec-WebSocket-Key"] = generateWebSocketKey()
+
+            // Initialize with headers and message callback for voice commands
+            webSocketClient = AudioWebSocketClient(
+                serverUri,
+                headers,
+                messageCallback = { message ->
+                    // Process received messages through the voice command handler
+                    voiceCommandHandler.processWebSocketMessage(message)
+                }
+            )
+
+            // Set connection timeout
+            webSocketClient.setConnectionLostTimeout(15) // 15 seconds
+
+            // Connect with timeout
+            Log.d(TAG, "Attempting to connect to WebSocket server...")
+            webSocketClient.connect()
+
+            // Add a timeout check to see if connection was successful
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (webSocketClient.isOpen) {
+                    Log.d(TAG, "WebSocket connection established successfully!")
+                } else {
+                    Log.e(TAG, "Failed to establish WebSocket connection after timeout")
+                    // Add UI feedback here to inform the user
+                }
+            }, 5000) // 5 second timeout
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error in onCreate: ${e.message}", e)
             throw e // Re-throw to show in crash logs
         }
+    }
+
+    private fun stopRecording() {
+        isRecording.set(false)
+        webSocketClient.stopRecording()
+        audioRecord?.stop()
+        audioRecord?.release()
+        audioRecord = null
     }
 
     private fun checkPermission(): Boolean {
@@ -217,6 +263,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    // Replace the existing onRequestPermissionsResult with this updated version
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,

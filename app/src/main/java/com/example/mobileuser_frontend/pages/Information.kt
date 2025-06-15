@@ -32,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -339,7 +341,10 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
 
                         modifier = Modifier
                     .fillMaxWidth()
-                    .height(70.dp),
+                    .height(70.dp)
+                            .semantics {
+                                contentDescription = "Sauvegarder"
+                            },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
                 elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
