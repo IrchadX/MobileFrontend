@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +41,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
@@ -47,7 +49,9 @@ import com.example.mobileuser_frontend.R
 import com.example.mobileuser_frontend.data.model.DeviceData
 import com.example.mobileuser_frontend.functions.fetchDeviceInfo
 import com.example.mobileuser_frontend.module.fontSizeSmallText
+import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.module.fontSizeText
+import com.example.mobileuser_frontend.module.fontSizeTitle
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.LocationViewModel
 import kotlinx.coroutines.flow.firstOrNull
@@ -79,7 +83,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
         fetchDeviceInfo(id) { info ->
             data = info
             if (data == null){
-                Toast.makeText(context, "User n'a pas d'appareil" , Toast.LENGTH_LONG).show()}
+                Toast.makeText(context, "Vous n'avez pas d'appareil" , Toast.LENGTH_LONG).show()}
         }
 
     }
@@ -94,12 +98,14 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
     ) {
         Text(
             text = "Appareil",
+            textAlign = TextAlign.Center,
             color = Color(0xff17252a),
             style = TextStyle(
-                fontSize = fontSizeText(),
+                fontSize = fontSizeTitle(),
                 fontWeight = FontWeight.Bold,),
 
         )
+        Spacer(modifier = Modifier.padding(top = 5.dp))
         Column(
 
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
@@ -110,7 +116,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
 
             Text(
                 text = "État de la batterie",
-                fontSize = fontSizeSmallText(),
+                fontSize = fontSizeText(),
                 color = Color(0xff17252a),
                 style = MaterialTheme.typography.headlineSmall)
             Box(
@@ -126,13 +132,13 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                     text = data?.battery_capacity?.toString()?.plus(" %") ?: "Pas de batterie",
                     color = Color.White,
                     style = TextStyle(
-                        fontSize = fontSizeText(),
+                        fontSize = fontSizeSubTitle(),
                         fontWeight = FontWeight.Bold),
                     modifier = Modifier .padding(start= 5.dp)
                         .fillMaxWidth())
             }
         }
-
+        Spacer(modifier = Modifier.padding(top = 40.dp))
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
             modifier = Modifier
@@ -144,12 +150,13 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                 color = Color.Black,
                 lineHeight = 6.51.em,
                 style = TextStyle(
-                    fontSize = fontSizeSmallText()
+                    fontSize = fontSizeText()
                 ),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .fillMaxWidth()
             )
+            Spacer(modifier = Modifier.padding(top = 10.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,7 +208,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                 }
             }
 
-
+            Spacer(modifier = Modifier.padding(top = 10.dp))
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
                 modifier = Modifier
@@ -253,6 +260,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                 }
             }
 
+            Spacer(modifier = Modifier.padding(top = 10.dp))
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
                 modifier = Modifier
@@ -303,24 +311,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                     )
                 }
             }
-            Button(
-                onClick = {},
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2222)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(90.dp)
-                    .semantics {
-                        contentDescription = "Signaler un problème"
-                    },
-            ) {
-                Text(
-                    text = "Signaler un problème",
-                    color = Color(0xfffcfffe),
-                    style = TextStyle(fontSize = fontSizeText()), // Adjusted font size for better fit
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
+            Spacer(modifier = Modifier.padding(top = 20.dp))
 
         }
 

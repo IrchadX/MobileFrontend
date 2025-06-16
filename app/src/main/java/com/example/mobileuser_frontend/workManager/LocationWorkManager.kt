@@ -20,6 +20,7 @@ import androidx.work.workDataOf
 import com.example.mobileuser_frontend.R
 import com.example.mobileuser_frontend.repository.LocationRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 class LocationWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
@@ -29,6 +30,8 @@ class LocationWorker(private val context: Context, workerParams: WorkerParameter
         private const val NOTIFICATION_CHANNEL_ID = "location_services_channel"
         private const val LOCATION_RETRY_DELAY_MS = 15000L // 15 seconds
         private const val MAX_RETRY_ATTEMPTS = 3
+        private const val LOCATION_UPDATE_INTERVAL_MS = 30000L // 30 seconds
+        private const val WORK_DURATION_MS = 14 * 60 * 1000L // 14 minutes (less than 15min period)
     }
 
     private val repository = LocationRepository(context)
@@ -38,8 +41,7 @@ class LocationWorker(private val context: Context, workerParams: WorkerParameter
         val userId = inputData.getString("userId")
             ?: return Result.failure(workDataOf("error" to "User ID is missing"))
 
-        val retryAttempt = inputData.getInt("retry_attempt", 0)
-        Log.d(TAG, "Starting location work for user $userId (attempt: ${retryAttempt + 1})")
+        Log.d(TAG, "Starting continuous location tracking for user $userId")
 
         // Check permissions first
         if (!hasLocationPermissions()) {
@@ -50,42 +52,53 @@ class LocationWorker(private val context: Context, workerParams: WorkerParameter
         // Check if location services are enabled
         if (!isLocationEnabled()) {
             Log.w(TAG, "Location services are disabled")
-
-            // Show notification to the user
             promptEnableLocationServices()
-
-            // If we haven't exceeded max retries, try again after delay
-            if (retryAttempt < MAX_RETRY_ATTEMPTS) {
-                delay(LOCATION_RETRY_DELAY_MS)
-                return Result.retry()
-            } else {
-                Log.e(TAG, "Max retry attempts reached while waiting for location services")
-                return Result.failure(workDataOf("error" to "Location services disabled after max retries"))
-            }
+            return Result.failure(workDataOf("error" to "Location services disabled"))
         }
 
-        // Now we can proceed with location fetch
+        // Start continuous location updates for the work duration
         return try {
-            val success = repository.fetchAndUpdateLocation(userId)
+            val startTime = System.currentTimeMillis()
+            var successCount = 0
+            var failureCount = 0
 
+            while (coroutineContext.isActive &&
+                (System.currentTimeMillis() - startTime) < WORK_DURATION_MS) {
 
-            if (success) {
-                Log.i(TAG, "Location updated successfully for user $userId")
-                Result.success()
-            } else {
-                Log.w(TAG, "Failed to update location for user $userId")
-                Result.failure(workDataOf("error" to "Location update failed"))
+                try {
+                    val success = repository.fetchAndUpdateLocation(userId)
+
+                    if (success) {
+                        successCount++
+                        Log.d(TAG, "Location update #$successCount successful for user $userId")
+                    } else {
+                        failureCount++
+                        Log.w(TAG, "Location update failed for user $userId (failure #$failureCount)")
+                    }
+                } catch (e: Exception) {
+                    failureCount++
+                    Log.e(TAG, "Exception during location update #$failureCount: ${e.message}", e)
+                }
+
+                // Wait for next update (30 seconds)
+                delay(LOCATION_UPDATE_INTERVAL_MS)
             }
+
+            Log.i(TAG, "Location tracking session completed. Success: $successCount, Failures: $failureCount")
+
+            // Consider it successful if at least some updates worked
+            if (successCount > 0) {
+                Result.success(workDataOf(
+                    "success_count" to successCount,
+                    "failure_count" to failureCount
+                ))
+            } else {
+                Result.failure(workDataOf("error" to "No successful location updates"))
+            }
+
         } catch (e: Exception) {
-            Log.e(TAG, "Exception during location update: ${e.message}", e)
-
-            if (isTransientError(e) && retryAttempt < MAX_RETRY_ATTEMPTS) {
-                Log.d(TAG, "Transient error detected. Scheduling retry...")
-                Result.retry()
-            } else {
-                Log.e(TAG, "Permanent error or max retries reached")
-                Result.failure(workDataOf("error" to "Exception: ${e.message}"))
-            }
+            Log.e(TAG, "Exception during continuous location tracking: ${e.message}", e)
+            Result.failure(workDataOf("error" to "Exception: ${e.message}"))
         }
     }
 

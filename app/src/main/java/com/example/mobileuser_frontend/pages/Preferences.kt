@@ -1,13 +1,13 @@
 package com.example.mobileuser_frontend.pages
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,15 +27,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.mobileuser_frontend.VoiceCommandHandler
 import com.example.mobileuser_frontend.module.CustomDropdown
 import com.example.mobileuser_frontend.module.ListItems
-import com.example.mobileuser_frontend.VoiceCommandHandler
+import com.example.mobileuser_frontend.module.fontSizeSubTitle
+import com.example.mobileuser_frontend.module.fontSizeText
+import com.example.mobileuser_frontend.module.fontSizeTitle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -113,7 +117,7 @@ fun Preferences(
             text = "Préférences de Navigation",
             color = Color(0xff17252a),
             style = TextStyle(
-                fontSize = 23.sp,
+                fontSize = fontSizeTitle(),
                 fontWeight = FontWeight.Bold,
             ),
             modifier = Modifier.align(Alignment.Start)
@@ -124,7 +128,7 @@ fun Preferences(
             text = "Guidage Vocal",
             color = Color(0xff17252a),
             style = TextStyle(
-                fontSize = 15.sp,
+                fontSize = fontSizeText(),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Start,
             ),
@@ -143,7 +147,7 @@ fun Preferences(
                 text = "Langue",
                 color = Color(0xff17252a),
                 style = TextStyle(
-                    fontSize = 15.sp,
+                    fontSize = fontSizeText(),
                     fontWeight = FontWeight.Medium
                 ),
                 modifier = Modifier
@@ -163,7 +167,7 @@ fun Preferences(
                 text = "Genre de Voix",
                 color = Color(0xff17252a),
                 style = TextStyle(
-                    fontSize = 15.sp,
+                    fontSize = fontSizeText(),
                     fontWeight = FontWeight.Medium
                 ),
                 modifier = Modifier
@@ -190,7 +194,7 @@ fun Preferences(
                 text = "Vibration",
                 color = Color(0xff17252a),
                 style = TextStyle(
-                    fontSize = 20.sp,
+                    fontSize = fontSizeText(),
                     fontWeight = FontWeight.Bold,
                 ),
                 modifier = Modifier.align(Alignment.Start),
@@ -206,7 +210,7 @@ fun Preferences(
                     text = "Sensibilité",
                     color = Color(0xff17252a),
                     style = TextStyle(
-                        fontSize = 15.sp,
+                        fontSize = fontSizeText(),
                         fontWeight = FontWeight.Medium
                     ),
                     modifier = Modifier
@@ -230,6 +234,7 @@ fun Preferences(
             }
 
             // Update the Save button onClick in your Preferences composable
+            Spacer(modifier = Modifier.padding(top = 20.dp))
 
             Button(
                 onClick = {
@@ -305,7 +310,10 @@ fun Preferences(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
+                    .height(70.dp)
+                    .semantics {
+                        contentDescription = "Sauvegarder"
+                    },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
                 elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
@@ -314,10 +322,11 @@ fun Preferences(
                     text = "Sauvegarder",
                     color = Color(0xfffcfffe),
                     style = TextStyle(
-                        fontSize = 18.sp,
+                        fontSize = fontSizeSubTitle(),
                         fontWeight = FontWeight.SemiBold,
                     )
                 )
+
             }
         }
     }

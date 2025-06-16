@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -29,9 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.state.UiState
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.PairingViewModel
@@ -96,12 +102,25 @@ fun AddAidant( navController: NavController,
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
                     .semantics {
                         contentDescription = "Envoyer"
                     },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
+                elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
             ) {
-                Text("Envoyer")
+                Text(
+                    text = "Envoyer",
+                    color = Color(0xfffcfffe),
+                    style = TextStyle(
+                        fontSize = fontSizeSubTitle(),
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                )
+
             }
             when (state) {
                 is UiState.Idle -> {

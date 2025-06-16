@@ -212,9 +212,8 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                 )
             }
         }
-        Spacer(modifier = Modifier.padding(top = 12.dp))
+        Spacer(modifier = Modifier.padding(top = 40.dp))
         val context = LocalContext.current
-        val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
         Button(
             onClick = {viewModel.fetchPhoneNumber(id)
@@ -224,7 +223,7 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.3f)
-                .height(80.dp)
+                .height(120.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .padding(all = 5.dp)
                 .semantics {
@@ -239,6 +238,7 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                 style = TextStyle(fontSize = 30.sp)
             )
         }
+        Spacer(modifier = Modifier.padding(top = 40.dp))
         Text(
             text = "Appel Urgent",
             color = Color.Black,
@@ -249,6 +249,7 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
             ),
             modifier = Modifier.padding(top = 6.dp, bottom = 6.dp),
         )
+        Spacer(modifier = Modifier.padding(top = 20.dp))
 
         //Case of the Emergency List
         when (val state = uiEmergencyState) {
@@ -296,8 +297,8 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
             dropdownState.items = items
         }
         val density = LocalDensity.current
-        val backgroundColor = Color(0xFF2B7A78).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
-        val borderColor = Color(0xFF3AAFA9) // Your teal border color
+        val backgroundColor = Color(0xffd1f1e6).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
+        val borderColor = Color(0xffd1f1e6)
 
         Box(modifier = Modifier.fillMaxWidth()) {
             // Custom styled TextField
@@ -312,7 +313,6 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                         modifier = Modifier.clickable {
                             dropdownState.onEnabled(!dropdownState.enabled)
                         },
-                        tint = Color(0xFF17252A)
                     )
                 },
                 modifier = Modifier
@@ -327,11 +327,11 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                         shape = RoundedCornerShape(8.dp)
                     ),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,  // replaces containerColor
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color(0xFF17252A)
+                    focusedContainerColor = Color(0xffd1f1e6),  // replaces containerColor
+                    unfocusedContainerColor = Color(0xffd1f1e6),
+                    focusedIndicatorColor = Color(0xffd1f1e6),
+                    unfocusedIndicatorColor = Color(0xffd1f1e6),
+                    cursorColor = Color(0xffd1f1e6)
                 ),
                 textStyle = TextStyle(
                     fontSize = 16.sp
@@ -369,7 +369,7 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
                                     callPermissionState.launchPermissionRequest()
                                     Toast.makeText(
                                         context,
-                                        "Permission required to make a call.",
+                                        "Accorder la permission pour initier l'appel.",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -141,14 +142,18 @@ fun SignInScreen(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Main content
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .fillMaxHeight()
                     .padding(top = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
+
 
                 Text(
                     text = "Hello Again !",
@@ -164,8 +169,7 @@ fun SignInScreen(
                     fontSize = fontSizeSmallText(),
                     color = Color.Gray
                 )
-
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // Email field
                 Column(
@@ -255,7 +259,7 @@ fun SignInScreen(
 
 
 
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // Sign in button
                 Button(

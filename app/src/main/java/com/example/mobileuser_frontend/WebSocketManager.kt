@@ -17,7 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.URI
-import java.util.*
+import java.util.Random
 import java.util.concurrent.atomic.AtomicBoolean
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -50,7 +50,7 @@ class WebSocketManager(
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun setupWebSocketClient() {
         try {
-            val serverUri = URI("wss://7b9d-154-121-119-219.ngrok-free.app")
+            val serverUri = URI("ws://192.168.43.121:8765")
             Log.d(TAG, "Setting up WebSocket client for: $serverUri")
 
             val headers = HashMap<String, String>()

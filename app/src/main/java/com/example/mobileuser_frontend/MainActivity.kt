@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -61,14 +62,27 @@ import com.example.mobileuser_frontend.viewmodel.LocationViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions: Map<String, Boolean> ->
+
+            val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            if (granted) {
+                startLocationTracking(userId.toString())
+            }
+        }
+
+
     private val TAG = "MainActivity"
     private val PERMISSION_REQUEST_CODE = 200
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    private lateinit var locationServiceManager: LocationServiceManager
 
     // SOLUTION 1: Use local variables for smart cast
     private var voiceCommandHandler: VoiceCommandHandler? = null
     private var webSocketManager: WebSocketManager? = null
     private lateinit var authViewModel: AuthViewModel
+    private lateinit var userId: String // Declare here but initialize late
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @SuppressLint(
@@ -77,6 +91,25 @@ class MainActivity : ComponentActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //authViewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
+
+        // Now it's safe to access authViewModel
+        userId = "136"
+        //For localisation
+        locationServiceManager = LocationServiceManager(this)
+
+        // Make sure location permissions are granted!
+        if (hasLocationPermissions()) {
+            locationServiceManager.startLocationTracking(userId)
+        } else {
+
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
 
         Log.d(TAG, "=== ONCREATE START ===")
 
@@ -202,6 +235,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun hasLocationPermissions(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
     private fun checkPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,
@@ -256,6 +296,9 @@ class MainActivity : ComponentActivity() {
 
         Log.d(TAG, "=== LANGUAGE CHANGE FROM UI END ===")
     }
+    private fun startLocationTracking(userId : String ) {
+        locationServiceManager.startLocationTracking(userId)
+    }
 }
 
 // ALTERNATIVE SOLUTION 2: Use lateinit (if you're sure it will be initialized)
@@ -292,6 +335,7 @@ class MainActivity : ComponentActivity() {
 }
 */
 
+
 class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LocationViewModel::class.java)) {
@@ -325,6 +369,7 @@ fun NavBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color.White)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -362,9 +407,9 @@ fun NavBar(
             contentColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
             modifier = Modifier
-                .size(110.dp)
+                .size(130.dp)
                 .padding(bottom = 2.dp)
-                .offset(y = -20.dp)
+                .offset(y = -10.dp)
                 .border(
                     BorderStroke(4.dp, if (isRecording) Color(0xFFFF6666) else Color.White),
                     CircleShape

@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +47,7 @@ import com.example.mobileuser_frontend.module.Dialog
 import com.example.mobileuser_frontend.module.fontSizeSmallText
 import com.example.mobileuser_frontend.module.fontSizeSubTitle
 import com.example.mobileuser_frontend.module.fontSizeText
+import com.example.mobileuser_frontend.module.fontSizeTitle
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -90,15 +92,15 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
             text = "Informations Personnelles",
             color = Color(0xff17252a),
             style = TextStyle(
-                fontSize = fontSizeText(),
+                fontSize = fontSizeTitle(),
                 fontWeight = FontWeight.Bold,
             ),
             modifier = Modifier
+                .padding(12.dp)
                 .align(Alignment.Start)
         )
 
-
-
+    Spacer(modifier = Modifier.height(20.dp))
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
             modifier = Modifier
@@ -110,7 +112,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                 text = "Changer Nom",
                 color = Color(0xff17252a),
                 style = TextStyle(
-                    fontSize = fontSizeSmallText(),
+                    fontSize = fontSizeText(),
                     fontWeight = FontWeight.SemiBold
                 ),
                 modifier = Modifier
@@ -158,6 +160,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                         )
                     )
                             }
+            Spacer(modifier = Modifier.height(20.dp))
             Divider(
                 color = Color.Gray.copy(alpha = 0.3f),
                 thickness = 2.dp,
@@ -167,7 +170,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                 text = "Changer le mot de passe",
                 color = Color(0xff17252a),
                 style = TextStyle(
-                    fontSize = fontSizeSmallText(),
+                    fontSize = fontSizeText(),
                     fontWeight = FontWeight.SemiBold
                 ),
                 modifier = Modifier
@@ -267,24 +270,28 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                 modifier = Modifier.fillMaxWidth()
             )
             var messages = remember { mutableStateOf("") }
+            Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
                     // Track completion states
                     var nameChangeCompleted = false
                     var passwordChangeCompleted = false
 
-                    var icon = R.drawable.iconconfirm
+                    // Track success states for each operation
+                    var nameChangeSuccess = true
+                    var passwordChangeSuccess = true
+
+                    // Track the final message
+                    var finalMessage = "Opération réussie"
+                    var overallSuccess = true
 
                     // Function to check conditions and show the popup
                     fun checkAndShowPopup() {
                         if (nameChangeCompleted && passwordChangeCompleted) {
-                            val finalMessage = when {
-                                messages.value.isNotEmpty() -> messages.value
-                                else -> "Opération réussie"
-                            }
-
+                            success.value = overallSuccess
+                            messages.value = finalMessage
                             dialog.text = finalMessage
-                            dialog.icon = if (success.value) R.drawable.iconconfirm else R.drawable.iconerror
+                            dialog.icon = if (overallSuccess) R.drawable.iconconfirm else R.drawable.iconerror
                             dialog.showDialog = true
                         }
                     }
@@ -294,16 +301,14 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                         changeUserData(id, text.value!!) { mess ->
                             nameChangeCompleted = true
                             if (mess != "Opération Réussie") {
-                                success.value = false
-                                icon = R.drawable.iconconfirm
-                                messages.value = mess.toString()
-                            } else {
-                                messages.value = mess
+                                nameChangeSuccess = false
+                                finalMessage = mess.toString()
+                                overallSuccess = false
                             }
-                            checkAndShowPopup() // Check and show popup after name change completes
+                            checkAndShowPopup()
                         }
                     } else {
-                        nameChangeCompleted = true // No name change needed, mark as completed
+                        nameChangeCompleted = true // No name change needed
                     }
 
                     // Handle password change if needed
@@ -314,25 +319,23 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                                 changeUserPassword(id, newpwd.value) { result ->
                                     passwordChangeCompleted = true
                                     if (result != "Opération Réussie") {
-                                        success.value = false
-                                        icon = R.drawable.iconerror
-                                        messages.value = result ?: "Une erreur inconnue est survenue"
-                                    } else {
-                                        messages.value = result
+                                        passwordChangeSuccess = false
+                                        finalMessage = result ?: "Une erreur inconnue est survenue"
+                                        overallSuccess = false
                                     }
-                                    checkAndShowPopup() // Check and show popup after password change completes
+                                    checkAndShowPopup()
                                 }
                             } else {
                                 // Invalid current password
                                 passwordChangeCompleted = true
-                                success.value = false
-                                icon = R.drawable.iconerror
-                                mes?.let { messages.value = it }
-                                checkAndShowPopup() // Check and show popup after password validation fails
+                                passwordChangeSuccess = false
+                                finalMessage = mes ?: "Mot de passe actuel incorrect"
+                                overallSuccess = false
+                                checkAndShowPopup()
                             }
                         }
                     } else {
-                        passwordChangeCompleted = true // No password change needed, mark as completed
+                        passwordChangeCompleted = true // No password change needed
                     }
 
                     // Final check to ensure popup is shown if no changes are needed

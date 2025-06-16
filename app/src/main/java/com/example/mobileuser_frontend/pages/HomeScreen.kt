@@ -143,7 +143,7 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel = androidx
                 modifier = Modifier
                     .padding(20.dp)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.12f)
+                    .fillMaxHeight(0.09f)
             )
             val context = LocalContext.current
             val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
@@ -154,30 +154,7 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel = androidx
                     .fillMaxHeight(),
             ) {
                 Button(
-                    onClick = {  /*when {
-                        callPermissionState.status.isGranted -> {
-                            // Permission already granted - make the call
-                            fetchPhoneNumber("66") { phone ->
-                                if (phone != null) {
-                                    makePhoneCall(context,phone)
-                                } else {
-                                    Toast.makeText(context, "Error: Try again Please", Toast.LENGTH_LONG).show()
-                                }
-                            }
-
-                        }
-                        callPermissionState.status.shouldShowRationale -> {
-                            Toast.makeText(
-                                context,
-                                "Phone call permission is required to make calls",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        else -> {
-                            // Request permission
-                            callPermissionState.launchPermissionRequest()
-                        }
-                    }*/
+                    onClick = {
                         call =true
                         callViewModel.fetchPhoneNumber(id)
 

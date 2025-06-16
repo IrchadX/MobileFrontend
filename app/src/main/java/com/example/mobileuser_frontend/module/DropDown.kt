@@ -7,10 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -63,7 +63,7 @@ fun CustomDropdown(
     modifier: Modifier = Modifier,
     initialValue: String = "",
     backgroundColor: Color = Color(0xFF2B7A78).copy(alpha = 0.05f),
-    borderColor: Color = Color(0xFF3AAFA9),
+    borderColor: Color = Color(0xFF2B7A78),
     textColor: Color = Color(0xFF17252A),
     textStyle: TextStyle = TextStyle(fontSize = 16.sp)
 ) {
@@ -103,11 +103,11 @@ fun CustomDropdown(
                     shape = RoundedCornerShape(8.dp)
                 ),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color(0xFF17252A)
+                focusedContainerColor =   Color.Transparent,
+                unfocusedContainerColor =   Color.Transparent,
+                focusedIndicatorColor =  Color.Transparent,
+                unfocusedIndicatorColor =  Color.Transparent,
+                cursorColor =  Color(0xFF2B7A78)
             ),
             textStyle = textStyle
         )
@@ -121,16 +121,21 @@ fun CustomDropdown(
                 .heightIn(max = 200.dp) // enables scrolling if needed
         ) {
             dropdownState.items.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(text = item.label) },
-                    onClick = {
-                        dropdownState.onEnabled(false)
-                        dropdownState.value = item.label  // Update the text field with the selected label
-                        dropdownState.selectedIndex = items.indexOf(item)
-                        onItemSelected(item)  // Notify item selected
-                    }
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF2B7A78).copy(alpha = 0.05f))
+                        .clickable {
+                            dropdownState.onEnabled(false)
+                            dropdownState.value = item.label
+                            dropdownState.selectedIndex = dropdownState.items.indexOf(item)
+                            onItemSelected(item)
+                        }
+                        .padding(12.dp)
+                ) {
+                    Text(text = item.label)
+                }
+            }
             }
         }
     }
-}
