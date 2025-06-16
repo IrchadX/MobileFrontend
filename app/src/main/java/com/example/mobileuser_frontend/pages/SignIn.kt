@@ -108,6 +108,7 @@ fun SignInScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .fillMaxHeight()
                 .padding(top=5.dp),
             horizontalAlignment = Alignment.CenterHorizontally ,
             verticalArrangement = Arrangement.Center
@@ -124,7 +125,7 @@ fun SignInScreen(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    //verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Left side with logo and text
                     Box(
@@ -142,7 +143,8 @@ fun SignInScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(40.dp))
+           // Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Main content
             Column(
@@ -169,8 +171,8 @@ fun SignInScreen(
                     fontSize = fontSizeSmallText(),
                     color = Color.Gray
                 )
-                Spacer(modifier = Modifier.height(40.dp))
-
+                //Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 // Email field
                 Column(
                     modifier = Modifier.fillMaxWidth()
@@ -259,8 +261,8 @@ fun SignInScreen(
 
 
 
-                Spacer(modifier = Modifier.height(40.dp))
-
+                //Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 // Sign in button
                 Button(
                     onClick = { viewModel.signIn(email, password) },
@@ -283,7 +285,8 @@ fun SignInScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                //Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // Not registered
                 Row(

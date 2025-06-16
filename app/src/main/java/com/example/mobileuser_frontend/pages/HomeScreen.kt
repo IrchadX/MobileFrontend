@@ -42,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mobileuser_frontend.R
 import com.example.mobileuser_frontend.Screens
+import com.example.mobileuser_frontend.functions.makePhoneCall
 import com.example.mobileuser_frontend.module.fontSizeTitle
 import com.example.mobileuser_frontend.state.EmergencyUiState
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
@@ -156,9 +157,7 @@ fun HomeScreen(navController: NavController, viewModel: AuthViewModel = androidx
                 Button(
                     onClick = {
                         call =true
-                        callViewModel.fetchPhoneNumber(id)
-
-
+                        makePhoneCall(context, "115")
                     },
                     modifier = Modifier.semantics {
                         this.contentDescription = "S.O.S"

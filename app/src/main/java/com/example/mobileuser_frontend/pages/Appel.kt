@@ -278,107 +278,106 @@ fun Appel(navController: NavController, viewModel: CallViewModel = viewModel(), 
         }
 
 
-        }
     }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun EmergencyDropdown( items: List<ListItems>){
-        val dropdownState = remember { DropDown() }
-
-
-        val context = LocalContext.current
-        val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmergencyDropdown( items: List<ListItems>){
+    val dropdownState = remember { DropDown() }
 
 
-        dropdownState.value = "Appel d'urgence"
-        // Update items when they are ready
-        LaunchedEffect(items) {
-            dropdownState.items = items
-        }
-        val density = LocalDensity.current
-        val backgroundColor = Color(0xffd1f1e6).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
-        val borderColor = Color(0xffd1f1e6)
+    val context = LocalContext.current
+    val callPermissionState = rememberPermissionState(Manifest.permission.CALL_PHONE)
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            // Custom styled TextField
-            OutlinedTextField(
-                value = dropdownState.value,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(id = dropdownState.icon),
-                        contentDescription = "Menu déroulant",
-                        modifier = Modifier.clickable {
-                            dropdownState.onEnabled(!dropdownState.enabled)
-                        },
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        dropdownState.onSize(coordinates.size.toSize())
-                    }
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(backgroundColor)
-                    .border(
-                        BorderStroke(1.dp, borderColor),
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xffd1f1e6),  // replaces containerColor
-                    unfocusedContainerColor = Color(0xffd1f1e6),
-                    focusedIndicatorColor = Color(0xffd1f1e6),
-                    unfocusedIndicatorColor = Color(0xffd1f1e6),
-                    cursorColor = Color(0xffd1f1e6)
-                ),
-                textStyle = TextStyle(
-                    fontSize = 16.sp
+
+    dropdownState.value = "Appel d'urgence"
+    // Update items when they are ready
+    LaunchedEffect(items) {
+        dropdownState.items = items
+    }
+    val density = LocalDensity.current
+    val backgroundColor = Color(0xffd1f1e6).copy(alpha = 0.05f) // 2B7A78 with 5% opacity
+    val borderColor = Color(0xffd1f1e6)
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        // Custom styled TextField
+        OutlinedTextField(
+            value = dropdownState.value,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = {
+                Icon(
+                    painter = painterResource(id = dropdownState.icon),
+                    contentDescription = "Menu déroulant",
+                    modifier = Modifier.clickable {
+                        dropdownState.onEnabled(!dropdownState.enabled)
+                    },
                 )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    dropdownState.onSize(coordinates.size.toSize())
+                }
+                .clip(RoundedCornerShape(8.dp))
+                .background(backgroundColor)
+                .border(
+                    BorderStroke(1.dp, borderColor),
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xffd1f1e6),  // replaces containerColor
+                unfocusedContainerColor = Color(0xffd1f1e6),
+                focusedIndicatorColor = Color(0xffd1f1e6),
+                unfocusedIndicatorColor = Color(0xffd1f1e6),
+                cursorColor = Color(0xffd1f1e6)
+            ),
+            textStyle = TextStyle(
+                fontSize = 16.sp
             )
+        )
 
-            // Dropdown Menu
-            DropdownMenu(
-                expanded = dropdownState.enabled,
-                onDismissRequest = { dropdownState.onEnabled(false) },
-                modifier = Modifier
-                    .width(with(density) { dropdownState.size.width.toDp() })
-                    .verticalScroll(rememberScrollState())
-                    .heightIn(max = 200.dp)
+        // Dropdown Menu
+        DropdownMenu(
+            expanded = dropdownState.enabled,
+            onDismissRequest = { dropdownState.onEnabled(false) },
+            modifier = Modifier
+                .width(with(density) { dropdownState.size.width.toDp() })
+                .verticalScroll(rememberScrollState())
+                .heightIn(max = 200.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxHeight().background(Color(0xffd1f1e6))
             ) {
-                Column(
-                    modifier = Modifier.fillMaxHeight().background(Color(0xffd1f1e6))
-                ) {
-                    dropdownState.items.forEach { item ->
-                        DropdownMenuItem(
-                            text = { Text(text = item.label) },
-                            onClick = {
-                                dropdownState.onEnabled(false)
-                                dropdownState.value = item.label
-                                dropdownState.selectedIndex = dropdownState.items.indexOf(item)
+                dropdownState.items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item.label) },
+                        onClick = {
+                            dropdownState.onEnabled(false)
+                            dropdownState.value = item.label
+                            dropdownState.selectedIndex = dropdownState.items.indexOf(item)
 
-                                // Check permission before making the call
-                                if (callPermissionState.status.isGranted) {
-                                    makePhoneCall(
-                                        context,
-                                        item.number
-                                    ) // Make the call directly if permission is granted
-                                } else {
-                                    // Request permission if not granted
-                                    callPermissionState.launchPermissionRequest()
-                                    Toast.makeText(
-                                        context,
-                                        "Accorder la permission pour initier l'appel.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                            // Check permission before making the call
+                            if (callPermissionState.status.isGranted) {
+                                makePhoneCall(
+                                    context,
+                                    item.number
+                                ) // Make the call directly if permission is granted
+                            } else {
+                                // Request permission if not granted
+                                callPermissionState.launchPermissionRequest()
+                                Toast.makeText(
+                                    context,
+                                    "Accorder la permission pour initier l'appel.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
-
         }
-    }
 
+    }
+}

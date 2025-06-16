@@ -100,7 +100,7 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                 .align(Alignment.Start)
         )
 
-    Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
             modifier = Modifier
@@ -135,31 +135,31 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
             ) {
 
 
-                    TextField(
-                        value = text?.value ?: "",
-                        onValueChange = { newText ->
-                            text.value = newText
-                            changed.value = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp)
-                            .heightIn(min = 24.dp) //Minimum touch target
-                            .wrapContentHeight(align = Alignment.CenterVertically),
-                        textStyle = TextStyle(
-                            fontSize = fontSizeSmallText(),
-                            color = Color(0xff17252a)
-                        ),
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,  // replaces containerColor
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = Color(0xFF17252A)
-                        )
+                TextField(
+                    value = text?.value ?: "",
+                    onValueChange = { newText ->
+                        text.value = newText
+                        changed.value = true
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .heightIn(min = 24.dp) //Minimum touch target
+                        .wrapContentHeight(align = Alignment.CenterVertically),
+                    textStyle = TextStyle(
+                        fontSize = fontSizeSmallText(),
+                        color = Color(0xff17252a)
+                    ),
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,  // replaces containerColor
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = Color(0xFF17252A)
                     )
-                            }
+                )
+            }
             Spacer(modifier = Modifier.height(20.dp))
             Divider(
                 color = Color.Gray.copy(alpha = 0.3f),
@@ -342,12 +342,12 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
                     checkAndShowPopup()
                 },
 
-                        modifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                            .semantics {
-                                contentDescription = "Sauvegarder"
-                            },
+                    .semantics {
+                        contentDescription = "Sauvegarder"
+                    },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3AAFA9)),
                 elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
@@ -368,4 +368,3 @@ fun Information(viewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.
 
     }
 }
-

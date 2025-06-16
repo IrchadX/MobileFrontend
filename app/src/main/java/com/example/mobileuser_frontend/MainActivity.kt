@@ -51,6 +51,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -60,6 +61,8 @@ import com.example.mobileuser_frontend.ui.theme.MobileUser_FrontendTheme
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.LocationViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -76,12 +79,14 @@ class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
     private val PERMISSION_REQUEST_CODE = 200
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
-    private lateinit var locationServiceManager: LocationServiceManager
+    private val locationServiceManager by lazy { LocationServiceManager(this) }
 
     // SOLUTION 1: Use local variables for smart cast
     private var voiceCommandHandler: VoiceCommandHandler? = null
     private var webSocketManager: WebSocketManager? = null
-    private lateinit var authViewModel: AuthViewModel
+    private var authRepository : AuthRepository = AuthRepository(this)
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    private var authViewModel: AuthViewModel = AuthViewModel(authRepository)
     private lateinit var userId: String // Declare here but initialize late
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -92,25 +97,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //authViewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
-
-        // Now it's safe to access authViewModel
-        userId = "136"
-        //For localisation
-        locationServiceManager = LocationServiceManager(this)
-
-        // Make sure location permissions are granted!
-        if (hasLocationPermissions()) {
-            locationServiceManager.startLocationTracking(userId)
-        } else {
-
-            requestPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+        lifecycleScope.launch {
+            userId = authViewModel.authRepository.getUserId().firstOrNull() ?: ""
+            // Now, after userId is loaded, do what you want
+            if (hasLocationPermissions()) {
+                locationServiceManager.startLocationTracking(userId)
+            } else {
+                requestPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
                 )
-            )
+            }
         }
-
         Log.d(TAG, "=== ONCREATE START ===")
 
         try {

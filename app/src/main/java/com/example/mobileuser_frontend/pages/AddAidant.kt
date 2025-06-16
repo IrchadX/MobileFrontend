@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.mobileuser_frontend.module.fontSizeSubTitle
+import com.example.mobileuser_frontend.module.fontSizeText
 import com.example.mobileuser_frontend.state.UiState
 import com.example.mobileuser_frontend.viewmodel.AuthViewModel
 import com.example.mobileuser_frontend.viewmodel.PairingViewModel
@@ -104,7 +104,7 @@ fun AddAidant( navController: NavController,
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(70.dp)
+                    .height(50.dp)
                     .semantics {
                         contentDescription = "Envoyer"
                     },
@@ -116,7 +116,7 @@ fun AddAidant( navController: NavController,
                     text = "Envoyer",
                     color = Color(0xfffcfffe),
                     style = TextStyle(
-                        fontSize = fontSizeSubTitle(),
+                        fontSize = fontSizeText(),
                         fontWeight = FontWeight.SemiBold,
                     )
                 )

@@ -55,8 +55,7 @@ fun Profil(navController: NavController, viewModel: AuthViewModel = androidx.lif
 
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-         id = viewModel.authRepository.getUserId().firstOrNull() ?: ""
-        // now you can use id
+        id = viewModel.authRepository.getUserId().firstOrNull() ?: ""
     }
 
 
@@ -83,13 +82,13 @@ fun Profil(navController: NavController, viewModel: AuthViewModel = androidx.lif
                     value = name ?: "" // This will trigger recomposition
                 }
 
-                        /*
+                /*
 
-                        else {
-                            Toast.makeText(context, "Error: Refresh Page", Toast.LENGTH_LONG).show()
-                        }
-                         */
-                    }
+                else {
+                    Toast.makeText(context, "Error: Refresh Page", Toast.LENGTH_LONG).show()
+                }
+                 */
+            }
 
 
             Text(
@@ -138,12 +137,12 @@ fun Profil(navController: NavController, viewModel: AuthViewModel = androidx.lif
                         .clip(RoundedCornerShape(4.dp))
                         .padding(all = 15.dp)
                         .semantics {
-                            contentDescription = "Appairage"
+                            contentDescription = "Parrainage"
                         },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xff17252A))
                 ) {
                     Text(
-                        text = "Appairage",
+                        text = "Parrainage",
                         color = Color.White,
                         lineHeight = 1.5.em,
                         style = TextStyle(fontSize = fontSizeSubTitle())

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
@@ -21,8 +20,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,8 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -104,7 +99,7 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                 fontSize = fontSizeTitle(),
                 fontWeight = FontWeight.Bold,),
 
-        )
+            )
         Spacer(modifier = Modifier.padding(top = 5.dp))
         Column(
 
@@ -192,17 +187,17 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                             .requiredSize(size = 20.dp)
                     )
 
-                        Text(
-                            text = data?.state ?: "",
-                            color = Color(0xff17252a),
-                            lineHeight = 10.em,
-                            style = TextStyle(
-                                fontSize = fontSizeSmallText(),
-                                fontWeight = FontWeight.Medium
-                            ),
-                            modifier = Modifier
-                                .wrapContentHeight(align = Alignment.CenterVertically)
-                        )
+                    Text(
+                        text = data?.state ?: "",
+                        color = Color(0xff17252a),
+                        lineHeight = 10.em,
+                        style = TextStyle(
+                            fontSize = fontSizeSmallText(),
+                            fontWeight = FontWeight.Medium
+                        ),
+                        modifier = Modifier
+                            .wrapContentHeight(align = Alignment.CenterVertically)
+                    )
 
 
                 }
@@ -245,17 +240,17 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
                         )
                 ) {
 
-                        Text(
-                            text = data?.type ?: "",
-                            color = Color(0xff17252a),
-                            lineHeight = 10.em,
-                            style = TextStyle(
-                                fontSize = fontSizeSmallText(),
-                                fontWeight = FontWeight.Medium
-                            ),
-                            modifier = Modifier
-                                .wrapContentHeight(align = Alignment.CenterVertically)
-                        )
+                    Text(
+                        text = data?.type ?: "",
+                        color = Color(0xff17252a),
+                        lineHeight = 10.em,
+                        style = TextStyle(
+                            fontSize = fontSizeSmallText(),
+                            fontWeight = FontWeight.Medium
+                        ),
+                        modifier = Modifier
+                            .wrapContentHeight(align = Alignment.CenterVertically)
+                    )
 
                 }
             }
@@ -315,7 +310,6 @@ fun Appareil(navController: NavController, viewModel: AuthViewModel = androidx.l
 
         }
 
-        }
+    }
 
 }
-

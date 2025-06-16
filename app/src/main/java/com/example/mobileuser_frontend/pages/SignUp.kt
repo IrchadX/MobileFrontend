@@ -95,7 +95,7 @@ fun SignUpScreen(
                 .fillMaxWidth()
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+           // verticalArrangement = Arrangement.Center
         ) {
 
             Column(
@@ -104,7 +104,7 @@ fun SignUpScreen(
                     .fillMaxHeight()
                     .padding(top = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                //verticalArrangement = Arrangement.Center
             ) {
                 // Hello Again text
                 Text(
@@ -120,7 +120,9 @@ fun SignUpScreen(
 
 
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = "First Name",
