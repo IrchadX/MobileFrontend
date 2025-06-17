@@ -1,0 +1,734 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174902, 36.704772],
+            [3.174904, 36.704776],
+            [3.174911, 36.704774],
+            [3.174921, 36.704797],
+            [3.174931, 36.704794],
+            [3.174932, 36.704795],
+            [3.174984, 36.704777],
+            [3.174988, 36.704786],
+            [3.174992, 36.704785],
+            [3.174986, 36.704771],
+            [3.174933, 36.70479],
+            [3.174927, 36.704778],
+            [3.174981, 36.70476],
+            [3.174979, 36.704756],
+            [3.17492, 36.704776],
+            [3.174916, 36.704768],
+            [3.174902, 36.704772]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Zone navigable S4b",
+        "description": "Zone de navigation de la salle S4b",
+        "type": "zone",
+        "typeId": {
+          "id": 34,
+          "created_at": "2025-06-08T11:27:17.933Z",
+          "type": "Zone de circulation",
+          "color": "#FF4081",
+          "icon": "Flèche directionnelle",
+          "name": "Zone de circulation",
+          "description": "Couloirs, passages ou escaliers pour le déplacement.",
+          "priority": "Neutre",
+          "accessible": true
+        },
+        "id": 90,
+        "color": "#FF4081"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [3.174903, 36.704775],
+          [3.174917, 36.704803]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Tableau ",
+        "description": "Tableau salle S4b",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 144
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174958, 36.70478],
+            [3.174952, 36.704771],
+            [3.174942, 36.704774],
+            [3.174947, 36.704784],
+            [3.174958, 36.70478]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 2 ",
+        "description": "Table 2",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 133
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.17492, 36.704775],
+            [3.174917, 36.704768],
+            [3.174927, 36.704764],
+            [3.17493, 36.704772],
+            [3.17492, 36.704775]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 8",
+        "description": "Table 8",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 134
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174933, 36.704789],
+            [3.174946, 36.704784],
+            [3.17494, 36.704775],
+            [3.174928, 36.704779],
+            [3.174933, 36.704789]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 3",
+        "description": "Table 3",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 135
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 120
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174954, 36.704764],
+            [3.174951, 36.704757],
+            [3.174962, 36.704753],
+            [3.174965, 36.70476],
+            [3.174954, 36.704764]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 3",
+        "description": "Table 3",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 136
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174974, 36.704781],
+            [3.174979, 36.70479],
+            [3.174987, 36.704787],
+            [3.174983, 36.704779],
+            [3.174974, 36.704781]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 15",
+        "description": "Table 15",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 125
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174931, 36.704772],
+            [3.174928, 36.704764],
+            [3.174938, 36.704761],
+            [3.174941, 36.704768],
+            [3.174931, 36.704772]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 9",
+        "description": "Table 9",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 137
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 117
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 122
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174942, 36.704768],
+            [3.174939, 36.704761],
+            [3.17495, 36.704757],
+            [3.174953, 36.704764],
+            [3.174942, 36.704768]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 138
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174955, 36.704788],
+            [3.174959, 36.704797],
+            [3.174969, 36.704793],
+            [3.174964, 36.704785],
+            [3.174955, 36.704788]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 13",
+        "description": "Table 13",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 126
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 118
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 124
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174966, 36.70476],
+            [3.174963, 36.704753],
+            [3.174975, 36.704749],
+            [3.174978, 36.704755],
+            [3.174966, 36.70476]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 5",
+        "description": "Table 5",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 139
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 119
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 127
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704785],
+            [3.17497, 36.704793],
+            [3.174978, 36.70479],
+            [3.174973, 36.704782],
+            [3.174965, 36.704785]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 14",
+        "description": "Table 14",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 123
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 121
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.17492, 36.704809],
+            [3.174937, 36.704804],
+            [3.174931, 36.704794],
+            [3.174921, 36.704797],
+            [3.174911, 36.704774],
+            [3.174904, 36.704776],
+            [3.17492, 36.704809]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Estrade",
+        "description": "Estrade en bois de la salle s4b",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 141
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 129
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [3.174908, 36.70477],
+          [3.174916, 36.704768]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Porte",
+        "description": "Porte de la salle S4b",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 142
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174935, 36.704804],
+            [3.17493, 36.704795],
+            [3.174922, 36.704797],
+            [3.174926, 36.704806],
+            [3.174935, 36.704804]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Bureau",
+        "description": "Bureau salle s4b",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 143
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174944, 36.704792],
+            [3.174949, 36.704801],
+            [3.174958, 36.704797],
+            [3.174954, 36.704788],
+            [3.174944, 36.704792]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 12",
+        "description": "Table 12",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 128
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174932, 36.704795],
+            [3.174937, 36.704804],
+            [3.174947, 36.704801],
+            [3.174943, 36.704792],
+            [3.174932, 36.704795]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 11",
+        "description": "Table 11",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 130
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174965, 36.704767],
+            [3.17497, 36.704776],
+            [3.174984, 36.704771],
+            [3.174979, 36.704762],
+            [3.174965, 36.704767]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 10",
+        "description": "Table 10",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 131
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174969, 36.704776],
+            [3.174964, 36.704767],
+            [3.174953, 36.704771],
+            [3.174959, 36.70478],
+            [3.174969, 36.704776]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#FF0000",
+        "name": "Table 1",
+        "description": "Table 1",
+        "type": "poi",
+        "typeId": "poi",
+        "id": 132
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [3.17492, 36.70481],
+          [3.174902, 36.704772]
+        ]
+      },
+      "properties": {
+        "color": "#8B4513",
+        "name": "Wall",
+        "description": "wall delimiter",
+        "type": "wall",
+        "typeId": "wall",
+        "id": 173
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [3.174925622564217, 36.70482089179268],
+            [3.175000907795976, 36.70479696606411],
+            [3.17497129108304, 36.70473787673252],
+            [3.174897362342875, 36.70476270875817],
+            [3.174925848647007, 36.70482102619285],
+            [3.174927022113764, 36.70482102619285],
+            [3.174925622564217, 36.70482089179268]
+          ]
+        ]
+      },
+      "properties": {
+        "color": "#32CD32",
+        "name": "Environment",
+        "description": "environment delimiter",
+        "type": "environment",
+        "typeId": "environment",
+        "id": 17
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [3.174902, 36.704772],
+          [3.174976, 36.704748],
+          [3.174995, 36.704785],
+          [3.17492, 36.70481]
+        ]
+      },
+      "properties": {
+        "color": "#8B4513",
+        "name": "Wall",
+        "description": "wall delimiter",
+        "type": "wall",
+        "typeId": "wall",
+        "id": 172
+      }
+    }
+  ],
+  "properties": {
+    "environment": {
+      "name": "Environnement Demo S4B",
+      "description": "Salle des classes preparatoires en ESI.",
+      "address": "Oued Smar, Algiers, Algeria.",
+      "isPublic": false
+    }
+  }
+}
