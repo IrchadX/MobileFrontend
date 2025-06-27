@@ -56,6 +56,6 @@ The app can speak back to you in both **French** and **English**, providing audi
 - both the mobile app and the server should be on the same network / use ngrok 
 -  The model could not be deployed after many trials due to the size of the models that is not free to host. It's only deployed on a Docker image and used the day of the presentation with the IoT device and the mobile app.
 
-- Go to com.example.mobileuser_frontend.module folder and open the file Retrofit then change The Base_URL (on line 14 ) to https://apigateway-production-b99d.up.railway.app/api/v1/mobile
+- Go to com.example.mobileuser_frontend.module folder and open the file RetrofitClient then change The Base_URL (on line 14 ) to https://apigateway-production-b99d.up.railway.app/api/v1/mobile
 - Connect your phone to the computer or use android emulator , and click on the run app button on the center of the top bar.
 
