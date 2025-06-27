@@ -51,7 +51,7 @@ The app can speak back to you in both **French** and **English**, providing audi
 4. **Feedback**: The app speaks back to confirm the action
 
 ## Usage 
-- create a folder on your computer and clone the repository with : git clone
+- create a folder on your computer and clone the repository with : git clone https://github.com/IrchadX/MobileFrontend.git
 - change the server url in the WebSocketManager.kt file:  val serverUri = URI("ws://192.168.43.121:8765") to the vosk server url (IrchadTTS)
 - both the mobile app and the server should be on the same network / use ngrok 
 -  The model could not be deployed after many trials due to the size of the models that is not free to host. It's only deployed on a Docker image and used the day of the presentation with the IoT device and the mobile app.
